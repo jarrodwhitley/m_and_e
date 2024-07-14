@@ -12,8 +12,6 @@ const monthNames = [
 ];
 
 function getMonthName(date) {
-    // date is in the format of 'MM-DD'
-    // return "July 12th" from "7-12"
     let monthNumber = date.split('-')[0];
     let day = date.split('-')[1];
     let monthName = monthNames[monthNumber - 1];

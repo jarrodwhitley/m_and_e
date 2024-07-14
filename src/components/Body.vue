@@ -1,21 +1,17 @@
 <script setup>
 import {onMounted} from 'vue'
 
-
-defineProps({
+const props = defineProps({
+    dateObj: Object,
     content: Object
-})
-
-onMounted(() => {
-    console.log(content);
 })
 
 </script>
 
 <template>
     <div class="bg-white text-slate-900 h-max p-8">
-        <div class="pb-4" v-text="content.keyverse"></div>
-        <div v-text="content.body"></div>
+        <div class="pb-4" v-text="props.content.keyverse"></div>
+        <div v-text="props.content.body"></div>
     </div>
 </template>
 

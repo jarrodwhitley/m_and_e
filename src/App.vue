@@ -2,13 +2,18 @@
 import Header from './components/Header.vue'
 import Body from './components/Body.vue'
 import Footer from './components/Footer.vue'
-import content from './assets/content.json';
-import {onMounted} from "vue";
+import {onMounted, onBeforeMount} from "vue";
+import content from "./assets/content.json";
 
 let dateObj = {};
-let currentContent = {};
+let selectedContent = {};
 
-onMounted(() => {
+onBeforeMount(() => {
+    createDateObj();
+    fetchContent();
+});
+
+async function createDateObj() {
     const date = new Date();
     const month = date.getMonth() + 1;
     const day = date.getDate();
@@ -22,18 +27,20 @@ onMounted(() => {
     dateObj.time = time;
     // console.log(dateObj);
 
+}
+
+async function fetchContent() {
     content.forEach((item) => {
         if (item.date === dateObj.date && item.time === dateObj.time) {
-            currentContent = item;
-            console.log(currentContent);
+            selectedContent = item;
         }
     });
-});
+}
 
 </script>
 
 <template>
-<!--    <Header :date="dateObj.date"/>-->
-    <Body :date="dateObj" :content="currentContent"/>
-    <Footer/>
+    <Header v-if="dateObj.date" :date="dateObj.date"/>
+    <Body v-if="selectedContent.body" :date="dateObj" :content="selectedContent"/>
+<!--    <Footer/>-->
 </template>
