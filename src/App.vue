@@ -45,9 +45,9 @@ function toggleMenu() {
 
 <template>
     <div class="grid grid-rows-[60px_1fr] max-h-screen">
-        <Header v-if="dateObj.date" :date="dateObj.date" :time="dateObj.time" @toggle-menu="toggleMenu"/>
-        <Body v-if="selectedContent.body" :date="dateObj" :content="selectedContent"/>
-        <MobileMenu :show-menu="showMenu"/>
+        <Header id="header" v-if="dateObj.date" :date="dateObj.date" :time="dateObj.time" @toggle-menu="toggleMenu"/>
+        <Body id="body" v-if="selectedContent.body" :date="dateObj" :content="selectedContent"/>
+        <MobileMenu id="mobileMenu" :show-menu="showMenu" :time="dateObj.time"/>
     </div>
 </template>
 

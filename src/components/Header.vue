@@ -22,8 +22,7 @@ function getMonthName(date) {
 </script>
 
 <template>
-    <div class="bg-teal-800 text-white p-4 h-auto text-2xl grid grid-col-3 grid-rows-1 justify-center z-20 bg-center bg-cover"
-    :style="'background-image:url(' + [props.time === 'am' ? './src/assets/images/header_morning_bg.png' : '']">
+    <div class="bg-transparent text-white p-4 h-auto text-2xl grid grid-col-3 grid-rows-1 justify-center z-20">
         <div class="" v-text="getMonthName(props.date)"></div>
         <button class="menu-btn absolute top-4 right-4" @click="$emit('toggleMenu')">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
