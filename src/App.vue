@@ -1,12 +1,14 @@
 <script setup>
 import Header from './components/Header.vue'
 import Body from './components/Body.vue'
-import Footer from './components/Footer.vue'
-import {onMounted, onBeforeMount} from "vue";
+import MobileMenu from './components/MobileMenu.vue'
+// import Footer from './components/Footer.vue'
+import { onBeforeMount, ref } from "vue";
 import content from "./assets/content.json";
 
 let dateObj = {};
 let selectedContent = {};
+const showMenu = ref(false);
 
 onBeforeMount(() => {
     createDateObj();
@@ -28,7 +30,6 @@ async function createDateObj() {
     // console.log(dateObj);
 
 }
-
 async function fetchContent() {
     content.forEach((item) => {
         if (item.date === dateObj.date && item.time === dateObj.time) {
@@ -36,11 +37,22 @@ async function fetchContent() {
         }
     });
 }
-
+function toggleMenu() {
+    showMenu.value = !showMenu.value;
+    console.log('App.vue -> showMenu', showMenu)
+}
 </script>
 
 <template>
-    <Header v-if="dateObj.date" :date="dateObj.date"/>
-    <Body v-if="selectedContent.body" :date="dateObj" :content="selectedContent"/>
-<!--    <Footer/>-->
+    <div class="grid grid-rows-[60px_1fr] max-h-screen">
+        <Header v-if="dateObj.date" :date="dateObj.date" :time="dateObj.time" @toggle-menu="toggleMenu"/>
+        <Body v-if="selectedContent.body" :date="dateObj" :content="selectedContent"/>
+        <MobileMenu :show-menu="showMenu"/>
+    </div>
 </template>
+
+<style>
+    body {
+        overflow: hidden;
+    }
+</style>
