@@ -2,17 +2,27 @@
 import Header from './components/Header.vue'
 import Body from './components/Body.vue'
 import MobileMenu from './components/MobileMenu.vue'
+import LoadingOverlay from './components/LoadingOverlay.vue'
 // import Footer from './components/Footer.vue'
-import { onBeforeMount, ref } from "vue";
+import {onBeforeMount, onMounted, ref} from "vue";
 import content from "./assets/content.json";
 
 let dateObj = {};
-let selectedContent = {};
+const isLoading = ref(false);
+const selectedContent = ref({});
 const showMenu = ref(false);
+const isIos = ref(navigator.userAgent.match(/(iPod|iPhone|iPad)/));
 
 onBeforeMount(() => {
     createDateObj();
     fetchContent();
+});
+
+onMounted(() => {
+    isLoading.value = false;
+    // setTimeout(() => {
+    //     isLoading.value = false;
+    // }, 2000);
 });
 
 async function createDateObj() {
@@ -33,21 +43,21 @@ async function createDateObj() {
 async function fetchContent() {
     content.forEach((item) => {
         if (item.date === dateObj.date && item.time === dateObj.time) {
-            selectedContent = item;
+            selectedContent.value = item;
         }
     });
 }
 function toggleMenu() {
     showMenu.value = !showMenu.value;
-    console.log('App.vue -> showMenu', showMenu)
 }
 </script>
 
 <template>
-    <div class="grid grid-rows-[60px_1fr] max-h-screen">
-        <Header id="header" v-if="dateObj.date" :date="dateObj.date" :time="dateObj.time" @toggle-menu="toggleMenu"/>
+    <LoadingOverlay :loading="isLoading"/>
+    <div class="grid grid-rows-[auto_1fr] min-h-screen max-h-screen bg-[#315668]">
+        <Header id="header" v-if="dateObj.date" :date="dateObj.date" :time="dateObj.time" :show-menu="showMenu" @toggle-menu="toggleMenu"/>
         <Body id="body" v-if="selectedContent.body" :date="dateObj" :content="selectedContent"/>
-        <MobileMenu id="mobileMenu" :show-menu="showMenu" :time="dateObj.time"/>
+        <MobileMenu id="mobileMenu" :show-menu="showMenu" :content="selectedContent" :date-obj="dateObj" :time="dateObj.time" :isIos="isIos"/>
     </div>
 </template>
 
