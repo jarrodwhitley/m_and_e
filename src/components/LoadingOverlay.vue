@@ -8,7 +8,7 @@ const props = defineProps({
     <div id="loadingOverlay" class="absolute top-0 bottom-0 left-0 right-0 z-50 bg-cover flex justify-center items-center"
          style="background-image:url(/src/assets/images/loading_bg.png)"
          :class="{'transition-all duration-400 delay-[1000ms] opacity-0 pointer-events-none' : !loading }">
-        <img src="/src/assets/images/spurgeon_icon.png"
+        <img src="../assets/images/spurgeon_icon.png"
              class="w-3/4 h-auto z-10 mix-blend-screen animate-grow"
              alt="icon image"/>
     </div>

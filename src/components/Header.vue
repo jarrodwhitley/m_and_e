@@ -25,7 +25,7 @@ function getMonthName(date) {
 <template>
     <div class="bg-transparent text-white p-4 h-fit text-2xl grid grid-cols-[1fr_3fr_1fr] grid-rows-1 justify-items-center items-center z-20"
     :class="[showMenu ? 'show-menu' : '']">
-        <img class="h-10 w-10 col-start-1 col-end-1 justify-self-start" src="/src/assets/images/spurgeon_icon.png" alt="logo"/>
+        <img class="h-10 w-10 col-start-1 col-end-1 justify-self-start" src="../assets/images/spurgeon_icon.png" alt="logo"/>
         <div class="date font-bold" v-text="getMonthName(props.date)"></div>
         <button class="menu-btn justify-self-end" @click="$emit('toggleMenu')">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
