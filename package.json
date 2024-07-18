@@ -1,7 +1,7 @@
 {
     "name": "vite-vue-starter",
     "private": true,
-    "homepage": "https://jarrodwhitley.github.io/m_and_e",
+    "homepage": "https://jarrodwhitley.github.io/m-and-e",
     "version": "0.0.0",
     "type": "module",
     "scripts": {
@@ -10,7 +10,7 @@
         "preview": "vite preview",
         "tailwind": "npx tailwindcss -i ./src/css/input.css -o ./src/style.css --watch",
         "predeploy": "vite build",
-        "deploy": "gh-pages -d dist"
+        "deploy": "rm -rf node_modules/.cache/gh-pages && vite build && gh-pages -d dist"
     },
     "dependencies": {
         "pinia": "^2.1.7",
