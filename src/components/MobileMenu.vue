@@ -22,7 +22,7 @@ function tipMe() {
 <template>
     <div class="absolute top-0 left-0 right-0 p-6 pb-4 text-white transition-all z-10 bg-center bg-cover shadow-gray-700 shadow-lg"
          :class="showMenu ? 'max-h-full duration-[1000ms]' : 'max-h-16 duration-0'"
-         :style="'background-image:url(' + [props.time === 'am' ? '../assets/images/header_morning_bg.png' : '../assets/images/header_evening_bg.png']">
+         :style="'background-image:url(' + [props.time === 'am' ? './assets/images/header_morning_bg.png' : './assets/images/header_evening_bg.png']">
         <ul class="grid gap-2 justify-end text-right font-bold text-[1rem] mt-14 transition"
             :class="[showMenu ? 'opacity-100 duration-300 delay-200' : 'opacity-0 duration-0']">
             <li v-if="!props.isIos" class="text-xl">
