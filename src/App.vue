@@ -8,7 +8,7 @@ import {onBeforeMount, onMounted, ref} from "vue";
 import content from "./assets/content.json";
 
 let dateObj = {};
-const isLoading = ref(false);
+const isLoading = ref(true);
 const selectedContent = ref({});
 const showMenu = ref(false);
 const isIos = ref(navigator.userAgent.match(/(iPod|iPhone|iPad)/));
@@ -19,10 +19,9 @@ onBeforeMount(() => {
 });
 
 onMounted(() => {
-    isLoading.value = false;
-    // setTimeout(() => {
-    //     isLoading.value = false;
-    // }, 2000);
+    setTimeout(() => {
+        isLoading.value = false;
+    }, 2000);
 });
 
 async function createDateObj() {

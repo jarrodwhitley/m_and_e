@@ -1,0 +1,11 @@
+{
+    "name": "Morning & Evening",
+    "short_name": "M & E",
+    "start_url": "https://jarrodwhitley.github.io/m_and_e",
+    "display": "standalone",
+    "icons": [{
+        "src": "/assets/spurgeon_icon_color.png",
+        "sizes": "512x512",
+        "type": "image/png"
+    }]
+}
