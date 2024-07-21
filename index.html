@@ -13,4 +13,14 @@
 <body>
     <div id="app"></div>
 </body>
+<script>
+    // if the time is before noon set the background color to green, but is after noon set the background color to red
+    const date = new Date();
+    const hours = date.getHours();
+    if (hours > 12) {
+        document.body.style.backgroundColor = '#320d6b';
+    } else {
+        document.body.style.backgroundColor = '#72baac';
+    }
+</script>
 </html>
