@@ -1,0 +1,27 @@
+{
+    "name": "vite-vue-starter",
+    "private": true,
+    "homepage": "https://jarrodwhitley.github.io/m_and_e",
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite --host",
+        "build": "vite build",
+        "pwa": "vite build --mode pwa",
+        "preview": "vite preview",
+        "tailwind": "npx tailwindcss -i ./src/css/input.css -o ../../style.css",
+        "watch": "npx tailwindcss -i ./src/css/input.css -o ../../style.css --watch",
+        "deploy": "rm -rf node_modules/.cache/gh-pages && vite build && gh-pages -d ./"
+    },
+    "dependencies": {
+        "pinia": "^2.1.7",
+        "vue": "^3.4.31"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^5.0.5",
+        "gh-pages": "^6.1.1",
+        "sass": "^1.77.8",
+        "tailwindcss": "^3.4.4",
+        "vite": "^5.3.2"
+    }
+}

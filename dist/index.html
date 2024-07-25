@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+<!--    <meta name="theme-color" content="#315668"/>-->
+    <link rel="icon" type="image/png" href="/m_and_e/assets/favicon-CrzO9TAg.ico"/>
+    <link rel="manifest" href="/m_and_e/assets/manifest-Cq3OIk-v.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>M & E</title>
+  <script type="module" crossorigin src="/m_and_e/assets/index-CXzO7DYr.js"></script>
+  <link rel="stylesheet" crossorigin href="/m_and_e/assets/index-BXVeRfdt.css">
+</head>
+<body>
+    <div id="app"></div>
+</body>
+<script>
+    // if the time is before noon set the background color to green, but is after noon set the background color to red
+    const date = new Date();
+    const hours = date.getHours();
+    if (hours > 12) {
+        document.body.style.backgroundColor = '#320d6b';
+    } else {
+        document.body.style.backgroundColor = '#72baac';
+    }
+
+    // Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(registration => {
+                    console.log('Service Worker registered! Scope: ', registration.scope);
+                })
+                .catch(err => {
+                    console.log('Service Worker registration failed: ', err);
+                });
+        });
+    }
+</script>
+</html>
