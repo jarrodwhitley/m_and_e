@@ -58,7 +58,7 @@ function decreaseFontSize() {
         </ul>
         <div id="settingsView"
              class="bg-white absolute top-[80px] left-0 right-0 bottom-0 p-6 pb-4 text-gray-800"
-             :class="showSettingsView ? '' : ''">
+             :class="showSettingsView ? 'show' : 'hide'">
             <!-- adjust font size with two buttons with minus and plus icons -->
             <label for="fontSize" class="text-xl">Font Size</label>
             <div class="flex justify-between">
