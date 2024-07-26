@@ -7,8 +7,10 @@
     "scripts": {
         "dev": "vite --host",
         "build": "vite build",
+        "pwa": "vite build --mode pwa",
         "preview": "vite preview",
-        "tailwind": "npx tailwindcss -i ./src/css/input.css -o ./src/style.css --watch",
+        "tailwind": "npx tailwindcss -i ./src/css/input.css -o ./style.css",
+        "watch": "npx tailwindcss -i ./src/css/input.css -o ./style.css --watch",
         "deploy": "rm -rf node_modules/.cache/gh-pages && vite build && gh-pages -d dist"
     },
     "dependencies": {

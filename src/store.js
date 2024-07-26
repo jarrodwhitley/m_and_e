@@ -1,9 +1,17 @@
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import App from './App.vue'
+import { defineStore } from 'pinia'
 
-const pinia = createPinia()
-const app = createApp(App)
-
-app.use(pinia)
-app.mount('#app')
+export const useAppStore = defineStore({
+    id: 'app',
+    state: () => {
+        return {
+            states: {
+                fontSize: 16,
+            },
+        }
+    },
+    actions: {
+        setFontSize(fontSize) {
+            this.states.fontSize = fontSize
+        }
+    },
+})

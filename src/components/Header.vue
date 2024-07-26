@@ -39,16 +39,6 @@ function getMonthName(date) {
 <style lang="scss" scoped>
     #header {
         position: relative;
-        &::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: -4px;
-            background: linear-gradient(to top, rgba(49, 86, 104, 1) 15%, transparent);
-            z-index: -1;
-        }
 
         &.show-menu {
             &::after {

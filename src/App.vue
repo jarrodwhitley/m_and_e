@@ -52,10 +52,10 @@ function toggleMenu() {
 </script>
 
 <template>
-    <LoadingOverlay :loading="isLoading"/>
-    <div class="grid grid-rows-[auto_1fr] min-h-screen max-h-screen bg-[#315668]">
+    <LoadingOverlay :loading="isLoading" :time="dateObj.time"/>
+    <div v-if="!isLoading" class="grid grid-rows-[auto_1fr] min-h-screen max-h-screen bg-[#315668] bg-center bg-cover" :class="dateObj.time === 'am' ? 'morning' : 'evening'">
         <Header id="header" v-if="dateObj.date" :date="dateObj.date" :time="dateObj.time" :show-menu="showMenu" @toggle-menu="toggleMenu"/>
-        <Body id="body" v-if="selectedContent.body" :date="dateObj" :content="selectedContent"/>
+        <Body v-if="selectedContent.body" :date="dateObj" :time="dateObj.time" :content="selectedContent"/>
         <MobileMenu id="mobileMenu" :show-menu="showMenu" :content="selectedContent" :date-obj="dateObj" :time="dateObj.time" :isIos="isIos"/>
     </div>
 </template>
@@ -63,5 +63,14 @@ function toggleMenu() {
 <style>
     body {
         overflow: hidden;
+    }
+
+    div {
+        &.morning {
+            background-image: url('/assets/header_morning_bg.png');
+        }
+        &.evening {
+            background-image: url('/assets/header_evening_bg.png');
+        }
     }
 </style>
