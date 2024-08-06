@@ -1,0 +1,32 @@
+{
+  "favicon.ico": {
+    "file": "assets/favicon-CrzO9TAg.ico",
+    "src": "favicon.ico"
+  },
+  "index.html": {
+    "file": "assets/index-Ds6y6BaX.js",
+    "name": "index",
+    "src": "index.html",
+    "isEntry": true,
+    "css": [
+      "assets/index-Bcdi7xqb.css"
+    ],
+    "assets": [
+      "assets/coffee-gray-C-UydHmC.png",
+      "assets/favicon-CrzO9TAg.ico",
+      "assets/manifest-BUECk0Mi.json"
+    ]
+  },
+  "manifest.json": {
+    "file": "assets/manifest-BUECk0Mi.json",
+    "src": "manifest.json"
+  },
+  "spurgeon_icon_color.png": {
+    "file": "assets/spurgeon_icon_color-DkrK0hJu.png",
+    "src": "spurgeon_icon_color.png"
+  },
+  "src/assets/coffee-gray.png": {
+    "file": "assets/coffee-gray-C-UydHmC.png",
+    "src": "src/assets/coffee-gray.png"
+  }
+}
