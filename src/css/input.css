@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+p {
+    @apply mt-2 indent-4;
+}
+
 .button.disabled img {
     @apply cursor-not-allowed opacity-20;
 }

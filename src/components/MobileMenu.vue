@@ -13,6 +13,9 @@ const props = defineProps({
 
 const store = useAppStore()
 
+function buyMeACoffee() {
+    window.open('https://buymeacoffee.com/jarrodwhitley', '_blank')
+}
 function shareDevotion() {
     // Only works with https
     if (navigator.share) {
@@ -26,9 +29,6 @@ function shareDevotion() {
     } else {
         console.log('Web Share API not supported');
     }
-}
-function tipMe() {
-    alert('yay!')
 }
 </script>
 
@@ -87,7 +87,7 @@ function tipMe() {
             <div class="mt-2 flex flex-col items-center justify-center">
                 <a class="menu-button m-0" href="#" @click="shareDevotion">
                     <img class="w-4 mr-2 inline" src="../assets/share-solid-gray.svg"/>Share App</a>
-                <a class="menu-button" href="https://buymeacoffee.com/jarrodwhitley">
+                <a class="menu-button" @click="buyMeACoffee">
                     <img class="w-4 mr-2 inline -translate-y-[2px]" src="../assets/coffee-gray.png"/>Buy me a coffee</a>
                 <a class="menu-button" href="mailto:support+m_and_e@jarrodwhitley.com">
                     <img class="w-4 mr-2 inline" src="../assets/bug-solid-gray.svg"/>Found a bug?</a>

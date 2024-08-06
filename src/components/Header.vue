@@ -6,6 +6,7 @@ const props = defineProps({
     date: String,
     time: String,
     showMenu: Boolean,
+    showAbout: Boolean
 })
 const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June', 'July',
@@ -31,7 +32,11 @@ function getMonthName(date) {
     <div class="bg-transparent text-white h-[60px] px-2 md:px-8 text-2xl grid grid-cols-[1fr_3fr_1fr] grid-rows-1 justify-items-center items-center z-20"
     :class="[props.showMenu ? 'show-menu' : '']">
         <img v-if="showMenu" class="back-btn justify-self-start cursor-pointer w-5 h-5" @click="$emit('toggleMenu')" src="../assets/arrow-left-solid.svg" alt="decrease font size"/>
-        <img v-else class="h-10 w-10 col-start-1 col-end-1 justify-self-start" src="/assets/spurgeon_icon.png" alt="logo"/>
+        <img v-else class="h-10 w-10 col-start-1 col-end-1 justify-self-start cursor-pointer"
+             :class="props.showAbout ? 'contrast-0' : ''"
+             src="/assets/spurgeon_icon.png"
+             @click="$emit('toggleAbout')"
+             alt="logo"/>
         <div class="date" v-text="headerTitle"></div>
         <button v-if="!showMenu" class="menu-btn justify-self-end mr-2" @click="$emit('toggleMenu')">
             <img class="h-4 w-4" src="../assets/gear-solid.svg"/>

@@ -27,7 +27,7 @@ onMounted(() => {
 
 <template>
     <div id="body" :style="'font-size:'+ store.fontSize.toString() +'px;'"
-         class="bg-white text-slate-900 h-[85vh] md:h-fit overflow-scroll text-justify p-4 mx-4 rounded md:p-8 md:w-3/4 md:mx-auto md:overflow-auto lg:w-3/4 xl:w-1/2">
+         class="bg-white text-slate-900 h-full max-h-[80vh] overflow-scroll text-justify p-4 mx-4 rounded md:p-8 md:w-3/4 md:mx-auto md:overflow-auto lg:w-3/4 xl:w-1/2">
         <div class="pb-4" v-text="props.content.keyverse"></div>
         <div v-text="bodyContent"></div>
     </div>
