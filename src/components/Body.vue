@@ -31,5 +31,5 @@ onMounted(() => {
         <div class="pb-4" v-text="props.content.keyverse"></div>
         <div v-text="bodyContent"></div>
     </div>
-    <div class="desktop-warning hidden w-full text-center mt-4 text-white lg:block">This app is not design for large screens, so it may look wonky ¯\_(ツ)_/¯ </div>
+    <div class="desktop-warning hidden w-full text-center mt-4 text-white lg:block">This app is not designed for large screens, so it may look wonky ¯\_(ツ)_/¯ </div>
 </template>
