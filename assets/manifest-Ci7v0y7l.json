@@ -6,7 +6,7 @@
     "theme_color": "#72baac",
     "background_color": "#72baac",
     "icons": [{
-        "src": "spurgeon_icon_color.png",
+        "src": "./src/assets/spurgeon_icon_color-DkrK0hJu.png",
         "sizes": "512x512",
         "type": "image/png"
     }]
