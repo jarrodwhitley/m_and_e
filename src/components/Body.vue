@@ -3,9 +3,11 @@ import { onMounted, ref, watch } from 'vue'
 import { useAppStore} from "../store.js";
 
 const props = defineProps({
-    dateObj: Object,
-    content: Object
+    content: Object,
+    isBookmarked: Boolean
 })
+
+defineEmits(['toggle-bookmark'])
 
 const store = useAppStore()
 
@@ -44,7 +46,13 @@ watch(() => props.content, (nextContent) => {
 
 <template>
     <section id="body" class="body-panel" :style="'font-size:'+ store.fontSize.toString() +'px;'">
-        <p class="key-verse" v-text="props.content.keyverse"></p>
+        <div class="key-verse-row">
+            <p class="key-verse" v-text="props.content.keyverse"></p>
+            <button class="bookmark-btn" :class="props.isBookmarked ? 'active' : ''" @click="$emit('toggle-bookmark')"
+                    :aria-label="props.isBookmarked ? 'Remove bookmark' : 'Add bookmark'">
+                {{ props.isBookmarked ? '★' : '☆' }}
+            </button>
+        </div>
         <p class="body-copy" v-text="bodyContent"></p>
     </section>
     <div class="desktop-warning">
@@ -74,6 +82,27 @@ watch(() => props.content, (nextContent) => {
     border-bottom: 1px solid #dbe5ea;
 }
 
+.key-verse-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    gap: 0.45rem;
+}
+
+.bookmark-btn {
+    border: 0;
+    background: transparent;
+    color: #6f8093;
+    font-size: 1.1em;
+    line-height: 1;
+    padding: 0.25rem 0.15rem;
+    cursor: pointer;
+}
+
+.bookmark-btn.active {
+    color: #c4852a;
+}
+
 .body-copy {
     margin: 0;
     color: #1d2330;
@@ -82,7 +111,7 @@ watch(() => props.content, (nextContent) => {
     text-wrap: pretty;
     overflow-wrap: anywhere;
     font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
-    padding: 0.9rem 1rem 1.2rem;
+    padding: 0.9rem 1rem calc(5.1rem + env(safe-area-inset-bottom, 0px));
 }
 
 .body-copy::first-letter {
