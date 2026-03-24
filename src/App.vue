@@ -48,7 +48,7 @@ async function createDateObj() {
     const month = date.getMonth() + 1;
     const day = date.getDate();
     let time;
-    if (date.getHours() > 12) {
+    if (date.getHours() >= 12) {
         time = 'pm';
     } else {
         time = 'am';
@@ -107,36 +107,39 @@ function setStatusBarTheme() {
 
 <template>
     <LoadingOverlay :loading="isLoading" :time="dateObj.time"/>
-    <div v-if="!isLoading" class="grid auto-rows-min min-h-screen max-h-screen bg-center bg-cover"
-         :class="theme">
-        <Header id="header"
-                v-if="dateObj.date"
-                :date="dateObj.date"
-                :time="dateObj.time"
-                :show-menu="showMenu"
-                :show-about="showAbout"
-                @toggle-menu="toggleMenu"
-                @toggle-about="toggleAbout"/>
-        <Body v-if="selectedContent.body"
-              :date="dateObj"
-              :time="dateObj.time"
-              :content="selectedContent"/>
-        <MobileMenu id="mobileMenu"
-                    :show-menu="showMenu"
-                    :show-settings="showSettings"
-                    @toggle-settings="toggleSettings"
-                    @increase-font-size="increaseFontSize"
-                    @decrease-font-size="decreaseFontSize"
-                    @reset-settings="store.resetSettings"
-                    @theme-auto="setAppTheme('auto')"
-                    @theme-light="setAppTheme('light')"
-                    @theme-dark="setAppTheme('dark')"
-                    :content="selectedContent"
+    <div v-if="!isLoading" class="app-scene" :class="theme">
+        <div class="scene-shape shape-a"></div>
+        <div class="scene-shape shape-b"></div>
+        <div class="scene-shape shape-c"></div>
+        <div class="reader-shell">
+            <Header id="header"
+                    v-if="dateObj.date"
+                    :date="dateObj.date"
                     :time="dateObj.time"
-                    :isIos="isIos"/>
-        <div class="modal absolute transition-all top-[60px] bottom-0 left-0 right-0 z-30 bg-white overflow-auto p-8 md:w-1/2 shadow-lg"
+                    :show-menu="showMenu"
+                    :show-about="showAbout"
+                    @toggle-menu="toggleMenu"
+                    @toggle-about="toggleAbout"/>
+            <Body v-if="selectedContent.body"
+                  :date="dateObj"
+                  :time="dateObj.time"
+                  :content="selectedContent"/>
+            <MobileMenu id="mobileMenu"
+                        :show-menu="showMenu"
+                        @close-menu="toggleMenu"
+                        @increase-font-size="increaseFontSize"
+                        @decrease-font-size="decreaseFontSize"
+                        @reset-settings="store.resetSettings"
+                        @theme-auto="setAppTheme('auto')"
+                        @theme-light="setAppTheme('light')"
+                        @theme-dark="setAppTheme('dark')"
+                        :content="selectedContent"
+                        :time="dateObj.time"
+                        :isIos="isIos"/>
+        </div>
+        <div class="modal transition-all"
              :class="showAbout ? '-translate-x-0' : '-translate-x-full'">
-<!--            <img class="close fixed w-6 top-4 right-4 opacity-40" @click="toggleAbout" src="/src/assets/xmark-solid.png" alt=""/>-->
+            <button class="modal-close" @click="toggleAbout" aria-label="Close about dialog">×</button>
             <img class="w-20 mx-auto" src="/assets/spurgeon_icon.png" alt="spurgeon icon black"/>
             <h1 class="text-3xl text-center">Morning & Evening</h1>
             <h3 class="text-center">By Charles Haddon Spurgeon</h3>
@@ -152,16 +155,135 @@ function setStatusBarTheme() {
 
 <style lang="scss">
     body {
-        overflow: hidden;
+        overflow: auto;
+        overflow-x: hidden;
         touch-action: manipulation;
+        margin: 0;
+        font-family: "Avenir Next", "Segoe UI", sans-serif;
     }
 
-    div {
-        &.morning {
-            background-image: url('/assets/header_morning_bg.png');
+    .app-scene {
+        --scene-bg: #eee8df;
+        --card-bg: #f3f5f6;
+        --ink: #1d2330;
+        --muted: #6c7786;
+        --accent: #a8c9d2;
+        --accent-deep: #7aa8b7;
+        min-height: 100vh;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        overflow-x: clip;
+        background: radial-gradient(circle at 20% 20%, #f7f1e8 0%, var(--scene-bg) 60%);
+        padding: 0;
+    }
+
+    .scene-shape {
+        position: absolute;
+        border-radius: 999px;
+        opacity: 0.35;
+        filter: blur(0px);
+        pointer-events: none;
+    }
+
+    .shape-a {
+        width: 18rem;
+        height: 18rem;
+        background: #d9ebef;
+        left: -4rem;
+        top: -4rem;
+    }
+
+    .shape-b {
+        width: 22rem;
+        height: 22rem;
+        background: #f2ddc7;
+        right: -7rem;
+        bottom: -8rem;
+    }
+
+    .shape-c {
+        width: 14rem;
+        height: 14rem;
+        background: #dce2d4;
+        right: 8%;
+        top: 10%;
+    }
+
+    .reader-shell {
+        width: 100%;
+        max-width: 28rem;
+        min-height: 100vh;
+        max-height: 100vh;
+        position: relative;
+        z-index: 2;
+        border-radius: 0;
+        border: 0;
+        background: var(--card-bg);
+        box-shadow: 0 18px 42px rgba(48, 55, 70, 0.16), inset 0 0 0 1px rgba(121, 152, 166, 0.18);
+        overflow: hidden;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .modal {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 30;
+        overflow: auto;
+        padding: 2rem;
+        background: #ffffff;
+        color: var(--ink);
+        box-shadow: 0 20px 45px rgba(22, 25, 32, 0.22);
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 0.9rem;
+        right: 0.9rem;
+        width: 2.2rem;
+        height: 2.2rem;
+        border: 0;
+        border-radius: 999px;
+        background: #e2e8ee;
+        color: #2a3a4b;
+        font-size: 1.45rem;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .morning {
+        --scene-bg: #ebe6dd;
+        --card-bg: #f5f7f8;
+        --accent: #a7c8d1;
+        --accent-deep: #78a6b4;
+    }
+
+    .evening {
+        --scene-bg: #ded7d0;
+        --card-bg: #ececf1;
+        --accent: #9ea9d4;
+        --accent-deep: #6674a9;
+    }
+
+    @media (max-width: 767px) {
+        .shape-c {
+            display: none;
         }
-        &.evening {
-            background-image: url('/assets/header_evening_bg.png');
+    }
+
+    @media (min-width: 960px) {
+        .reader-shell {
+            min-height: calc(100vh - 2rem);
+            max-height: calc(100vh - 2rem);
         }
     }
 </style>

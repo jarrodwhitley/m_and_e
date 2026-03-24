@@ -5,6 +5,10 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
     base: '/m_and_e/',
     root: './',
+    server: {
+        host: true,
+        allowedHosts: true,
+    },
     build: {
         outDir: './dist',
         emptyOutDir: true, // also necessary

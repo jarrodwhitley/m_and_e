@@ -4,7 +4,7 @@ export const useAppStore = defineStore({
     id: 'app',
     state: () => {
         return {
-            fontSize: 16,
+            fontSize: 17,
             theme: 'auto'
         }
     },
@@ -13,7 +13,7 @@ export const useAppStore = defineStore({
             this.fontSize = fontSize
         },
         resetSettings() {
-            this.fontSize = 16
+            this.fontSize = 17
         },
         setTheme(theme) {
             this.theme = theme
