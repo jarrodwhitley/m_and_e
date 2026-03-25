@@ -120,7 +120,7 @@ function setTextSize(size) {
     position: absolute;
     inset: 0;
     border: 0;
-    background: rgba(20, 27, 39, 0.26);
+    background: var(--overlay-background);
     opacity: 0;
     transition: opacity 220ms ease;
 }
@@ -134,11 +134,11 @@ function setTextSize(size) {
     width: 100%;
     max-height: min(74vh, 640px);
     border-radius: 2rem 2rem 0 0;
-    background: linear-gradient(to bottom, #f8fbfd, #eef3f7);
-    box-shadow: 0 -14px 36px rgba(23, 33, 48, 0.25), inset 0 0 0 1px rgba(88, 116, 132, 0.22);
+    background: linear-gradient(to bottom, color-mix(in srgb, var(--surface) 85%, var(--surface-secondary)), var(--surface-secondary));
+    box-shadow: 0 -14px 36px rgba(23, 33, 48, 0.25), inset 0 0 0 1px var(--border);
     overflow-y: auto;
     padding: 0.7rem 0.9rem 1.15rem;
-    color: #223040;
+    color: var(--text-primary);
     transform: translateY(calc(100% + 1rem));
     transition: transform 280ms ease;
 }
@@ -148,7 +148,7 @@ function setTextSize(size) {
     height: 0.34rem;
     border-radius: 999px;
     margin: 0.15rem auto 0.8rem;
-    background: rgba(105, 123, 137, 0.24);
+    background: color-mix(in srgb, var(--text-secondary) 40%, transparent);
 }
 
 .panel-visible {
@@ -164,7 +164,7 @@ function setTextSize(size) {
 
 .settings-heading {
     margin: 0.2rem 0 0.55rem;
-    color: #4f6275;
+    color: var(--text-secondary);
     font-size: 0.94rem;
     letter-spacing: 0.07em;
     font-weight: 600;
@@ -173,8 +173,8 @@ function setTextSize(size) {
 
 .settings-card {
     border-radius: 1rem;
-    background: #dfe7ef;
-    box-shadow: inset 0 0 0 1px rgba(104, 133, 155, 0.25);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--border);
     padding: 0.75rem;
     margin-bottom: 0.65rem;
 }
@@ -182,7 +182,7 @@ function setTextSize(size) {
 .section-label {
     display: block;
     font-weight: 600;
-    color: #2f4659;
+    color: var(--text-primary);
     margin-bottom: 0.5rem;
 }
 
@@ -196,14 +196,14 @@ function setTextSize(size) {
     border: 0;
     border-radius: 0.7rem;
     padding: 0.55rem 0.35rem;
-    background: #d0dbe4;
-    color: #243a4b;
+    background: var(--button-secondary-background);
+    color: var(--button-secondary-text);
     font-weight: 600;
 }
 
 .theme-btn.selected {
-    background: #7083bc;
-    color: #ffffff;
+    background: var(--button-primary);
+    color: var(--button-primary-text);
 }
 
 .font-label-row {
@@ -213,8 +213,8 @@ function setTextSize(size) {
 }
 
 .font-size-pill {
-    background: #cbd8e3;
-    color: #22394b;
+    background: var(--highlight);
+    color: var(--selected-text);
     border-radius: 999px;
     padding: 0.12rem 0.58rem;
     font-size: 0.85rem;
@@ -230,8 +230,8 @@ function setTextSize(size) {
 .font-preset-btn {
     border: 0;
     border-radius: 0.72rem;
-    background: #d4dee7;
-    color: #21384a;
+    background: var(--button-secondary-background);
+    color: var(--button-secondary-text);
     min-height: 2.5rem;
     font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
 }
@@ -249,8 +249,8 @@ function setTextSize(size) {
 }
 
 .font-preset-btn.selected {
-    background: #9ab6cb;
-    color: #ffffff;
+    background: var(--button-primary);
+    color: var(--button-primary-text);
 }
 
 .support-head {
@@ -264,25 +264,11 @@ function setTextSize(size) {
 
 .menu-link {
     text-decoration: none;
-    color: #1f3445;
-    background: #dbe5ee;
+    color: var(--button-secondary-text);
+    background: var(--button-secondary-background);
     border-radius: 0.75rem;
     padding: 0.58rem 0.7rem;
-    box-shadow: inset 0 0 0 1px rgba(124, 156, 170, 0.18);
-}
-
-.evening .settings-panel {
-    background: linear-gradient(to bottom, #f0f1f8, #e8ebf5);
-}
-
-.evening .settings-card,
-.evening .menu-link {
-    background: #d8deef;
-    box-shadow: inset 0 0 0 1px rgba(102, 114, 162, 0.24);
-}
-
-.evening .theme-btn.selected {
-    background: #7f8cc0;
+    box-shadow: inset 0 0 0 1px var(--border);
 }
 
 @media (min-width: 768px) {

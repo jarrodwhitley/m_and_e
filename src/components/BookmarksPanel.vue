@@ -62,14 +62,14 @@ const emit = defineEmits(['close', 'open-bookmark', 'clear-bookmarks'])
     position: absolute;
     inset: 0;
     border: 0;
-    background: rgba(20, 27, 39, 0.26);
+    background: var(--overlay-background);
 }
 
 .bookmarks-panel {
     width: 100%;
     max-height: 75vh;
     border-radius: 1.6rem 1.6rem 0 0;
-    background: linear-gradient(to bottom, #f9fbfc, #eef3f7);
+    background: linear-gradient(to bottom, color-mix(in srgb, var(--surface) 85%, var(--surface-secondary)), var(--surface-secondary));
     box-shadow: 0 -14px 36px rgba(23, 33, 48, 0.25);
     padding: 0.7rem 0.9rem 1.1rem;
     overflow: auto;
@@ -86,7 +86,7 @@ const emit = defineEmits(['close', 'open-bookmark', 'clear-bookmarks'])
     height: 0.34rem;
     border-radius: 999px;
     margin: 0.15rem auto 0.75rem;
-    background: rgba(105, 123, 137, 0.24);
+    background: color-mix(in srgb, var(--text-secondary) 40%, transparent);
 }
 
 .panel-head {
@@ -98,7 +98,7 @@ const emit = defineEmits(['close', 'open-bookmark', 'clear-bookmarks'])
 
 .panel-head h2 {
     margin: 0;
-    color: #2a4255;
+    color: var(--text-primary);
     font-size: 1rem;
 }
 
@@ -107,14 +107,14 @@ const emit = defineEmits(['close', 'open-bookmark', 'clear-bookmarks'])
     width: 2rem;
     height: 2rem;
     border-radius: 999px;
-    background: #dae5ec;
-    color: #243a4b;
+    background: var(--button-secondary-background);
+    color: var(--button-secondary-text);
     font-size: 1.25rem;
 }
 
 .hint {
     margin: 0.4rem 0;
-    color: #607689;
+    color: var(--text-secondary);
     font-size: 0.85rem;
 }
 
@@ -124,8 +124,8 @@ const emit = defineEmits(['close', 'open-bookmark', 'clear-bookmarks'])
 }
 
 .bookmark-item {
-    border: 1px solid #bfd1df;
-    background: #e6eef4;
+    border: 1px solid var(--border);
+    background: var(--surface);
     border-radius: 0.8rem;
     text-align: left;
     padding: 0.6rem 0.68rem;
@@ -135,12 +135,12 @@ const emit = defineEmits(['close', 'open-bookmark', 'clear-bookmarks'])
 
 .bookmark-date {
     font-size: 0.72rem;
-    color: #3b5365;
+    color: var(--text-secondary);
 }
 
 .bookmark-verse {
     font-size: 0.84rem;
-    color: #1f3445;
+    color: var(--text-primary);
 }
 
 .clear-btn {
@@ -149,8 +149,8 @@ const emit = defineEmits(['close', 'open-bookmark', 'clear-bookmarks'])
     border: 0;
     border-radius: 0.75rem;
     min-height: 2.45rem;
-    background: #d9e4eb;
-    color: #24394a;
+    background: var(--button-secondary-background);
+    color: var(--button-secondary-text);
     font-weight: 600;
 }
 </style>

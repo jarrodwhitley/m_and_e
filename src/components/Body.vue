@@ -1,18 +1,39 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useAppStore} from "../store.js";
 
 const props = defineProps({
-    content: Object,
-    isBookmarked: Boolean
+    content: Object
 })
-
-defineEmits(['toggle-bookmark'])
 
 const store = useAppStore()
 
 const verseReference = ref('')
 const bodyContent = ref('')
+
+const bodySegments = computed(() => {
+    const rawText = bodyContent.value || ''
+    const text = rawText
+        .replace(/[\u0080-\u009F]/g, '')
+        .replace(/^\s+/, '')
+
+    const match = text.match(/[A-Za-z]/)
+
+    if (!match || typeof match.index !== 'number') {
+        return {
+            leading: '',
+            dropCap: '',
+            rest: text
+        }
+    }
+
+    const index = match.index
+    return {
+        leading: text.slice(0, index),
+        dropCap: text.charAt(index),
+        rest: text.slice(index + 1)
+    }
+})
 
 function getVerseReference(string) {
     const parts = (string || '').split('—')
@@ -46,14 +67,14 @@ watch(() => props.content, (nextContent) => {
 
 <template>
     <section id="body" class="body-panel" :style="'font-size:'+ store.fontSize.toString() +'px;'">
-        <div class="key-verse-row">
-            <p class="key-verse" v-text="props.content.keyverse"></p>
-            <button class="bookmark-btn" :class="props.isBookmarked ? 'active' : ''" @click="$emit('toggle-bookmark')"
-                    :aria-label="props.isBookmarked ? 'Remove bookmark' : 'Add bookmark'">
-                {{ props.isBookmarked ? '★' : '☆' }}
-            </button>
-        </div>
-        <p class="body-copy" v-text="bodyContent"></p>
+        <p class="key-verse" v-text="props.content.keyverse"></p>
+        <p class="body-copy">
+            <span v-if="bodySegments.leading" v-text="bodySegments.leading"></span><span
+                v-if="bodySegments.dropCap"
+                class="drop-cap"
+                v-text="bodySegments.dropCap"
+            ></span><span v-text="bodySegments.rest"></span>
+        </p>
     </section>
     <div class="desktop-warning">
         Mobile-first layout with a classic reading mode.
@@ -64,7 +85,7 @@ watch(() => props.content, (nextContent) => {
 .body-panel {
     margin: 0;
     background: transparent;
-    color: #252d3a;
+    color: var(--text-primary);
     overflow: auto;
     overflow-x: hidden;
     text-align: left;
@@ -73,55 +94,38 @@ watch(() => props.content, (nextContent) => {
 
 .key-verse {
     margin: 0;
-    color: #5f6f81;
+    color: var(--text-secondary);
     font-size: 0.94em;
     font-weight: 500;
     line-height: 1.45;
     letter-spacing: 0.012em;
-    padding: 0.15rem 1rem 0.85rem;
-    border-bottom: 1px solid #dbe5ea;
-}
-
-.key-verse-row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: start;
-    gap: 0.45rem;
-}
-
-.bookmark-btn {
-    border: 0;
-    background: transparent;
-    color: #6f8093;
-    font-size: 1.1em;
-    line-height: 1;
-    padding: 0.25rem 0.15rem;
-    cursor: pointer;
-}
-
-.bookmark-btn.active {
-    color: #c4852a;
+    padding: 0.85rem;
+    text-indent: 0;
+    border-bottom: 1px solid var(--border);
 }
 
 .body-copy {
     margin: 0;
-    color: #1d2330;
+    color: var(--text-primary);
+    text-align: justify;
+    text-indent: 0;
     line-height: 1.62;
     letter-spacing: 0.002em;
     text-wrap: pretty;
     overflow-wrap: anywhere;
     font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
-    padding: 0.9rem 1rem calc(5.1rem + env(safe-area-inset-bottom, 0px));
+    padding: 0.9rem 1rem calc(var(--control-bar-height, 64px) + 1.15rem + env(safe-area-inset-bottom, 0px));
 }
 
-.body-copy::first-letter {
+.drop-cap {
     float: left;
-    font-size: 2.35em;
-    line-height: 0.86;
-    margin-right: 0.08em;
-    padding-top: 0.06em;
+    font-size: 3.1em;
+    line-height: 0.68;
+    margin-right: 0.165em;
+    margin-left: -0.015em;
+    padding-top: 0.08em;
     font-weight: 600;
-    color: #283546;
+    color: var(--accent-primary);
 }
 
 .desktop-warning {
@@ -129,10 +133,6 @@ watch(() => props.content, (nextContent) => {
 }
 
 @media (min-width: 1024px) {
-    .key-verse {
-        padding-inline: 1.25rem;
-    }
-
     .body-copy {
         padding-inline: 1.25rem;
     }
@@ -140,7 +140,7 @@ watch(() => props.content, (nextContent) => {
     .desktop-warning {
         display: block;
         text-align: center;
-        color: #728290;
+        color: var(--text-secondary);
         font-size: 0.84rem;
         letter-spacing: 0.03em;
         margin: 0 0 0.9rem;

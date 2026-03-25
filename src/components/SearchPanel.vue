@@ -117,7 +117,7 @@ function openPreview() {
     position: absolute;
     inset: 0;
     border: 0;
-    background: rgba(20, 27, 39, 0.26);
+    background: var(--overlay-background);
 }
 
 .search-panel {
@@ -125,7 +125,7 @@ function openPreview() {
     width: 100%;
     max-height: 80vh;
     border-radius: 1.6rem 1.6rem 0 0;
-    background: linear-gradient(to bottom, #f9fbfc, #eef3f7);
+    background: linear-gradient(to bottom, color-mix(in srgb, var(--surface) 85%, var(--surface-secondary)), var(--surface-secondary));
     box-shadow: 0 -14px 36px rgba(23, 33, 48, 0.25);
     overflow: auto;
     padding: 0.7rem 0.9rem 1rem;
@@ -142,7 +142,7 @@ function openPreview() {
     height: 0.34rem;
     border-radius: 999px;
     margin: 0.15rem auto 0.75rem;
-    background: rgba(105, 123, 137, 0.24);
+    background: color-mix(in srgb, var(--text-secondary) 40%, transparent);
 }
 
 .panel-head {
@@ -154,7 +154,7 @@ function openPreview() {
 
 .panel-head h2 {
     margin: 0;
-    color: #2a4255;
+    color: var(--text-primary);
     font-size: 1rem;
 }
 
@@ -163,23 +163,23 @@ function openPreview() {
     width: 2rem;
     height: 2rem;
     border-radius: 999px;
-    background: #dae5ec;
-    color: #243a4b;
+    background: var(--button-secondary-background);
+    color: var(--button-secondary-text);
     font-size: 1.25rem;
 }
 
 .search-input {
     width: 100%;
-    border: 1px solid #bed0dd;
+    border: 1px solid var(--border);
     border-radius: 0.8rem;
     padding: 0.7rem 0.8rem;
     font-size: 0.95rem;
-    color: #23394a;
-    background: #f8fcff;
+    color: var(--text-primary);
+    background: var(--surface);
 }
 
 .hint {
-    color: #607689;
+    color: var(--text-secondary);
     font-size: 0.85rem;
     margin: 0.7rem 0 0.5rem;
 }
@@ -191,8 +191,8 @@ function openPreview() {
 }
 
 .result-item {
-    border: 1px solid #bfd1df;
-    background: #e6eef4;
+    border: 1px solid var(--border);
+    background: var(--surface);
     border-radius: 0.8rem;
     text-align: left;
     padding: 0.55rem 0.65rem;
@@ -201,31 +201,31 @@ function openPreview() {
 }
 
 .result-item.selected {
-    background: #cfdeea;
-    border-color: #95b0c2;
+    background: var(--highlight);
+    border-color: var(--accent-secondary);
 }
 
 .result-date {
     font-size: 0.72rem;
-    color: #3b5365;
+    color: var(--text-secondary);
 }
 
 .result-verse {
     font-size: 0.83rem;
-    color: #1f3445;
+    color: var(--text-primary);
 }
 
 .preview-box {
     margin-top: 0.65rem;
     border-radius: 0.9rem;
-    background: #dce7ef;
+    background: var(--surface);
     padding: 0.7rem;
-    border: 1px solid #afc2d1;
+    border: 1px solid var(--border);
 }
 
 .preview-box h3 {
     margin: 0 0 0.35rem;
-    color: #30495d;
+    color: var(--text-secondary);
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -234,14 +234,14 @@ function openPreview() {
 .preview-verse {
     margin: 0;
     font-size: 0.84rem;
-    color: #21384a;
+    color: var(--text-primary);
     font-weight: 600;
 }
 
 .preview-text {
     margin: 0.45rem 0 0;
     font-size: 0.82rem;
-    color: #2a4051;
+    color: var(--text-secondary);
 }
 
 .open-btn {
@@ -250,8 +250,8 @@ function openPreview() {
     width: 100%;
     min-height: 2.4rem;
     border-radius: 0.75rem;
-    background: #7083bc;
-    color: #ffffff;
+    background: var(--button-primary);
+    color: var(--button-primary-text);
     font-weight: 600;
 }
 </style>

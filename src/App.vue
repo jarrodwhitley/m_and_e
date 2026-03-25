@@ -9,9 +9,7 @@ import SearchPanel from './components/SearchPanel.vue'
 import DatePickerPanel from './components/DatePickerPanel.vue'
 import BookmarksPanel from './components/BookmarksPanel.vue'
 import { useAppStore } from './store'
-
-const dayColor = '#74b9ac'
-const nightColor = '#332154'
+import { eveningTheme, morningTheme, themeToCssVariables } from './theme'
 
 const isLoading = ref(true)
 const showMenu = ref(false)
@@ -19,15 +17,17 @@ const showAbout = ref(false)
 const showSearch = ref(false)
 const showDatePicker = ref(false)
 const showBookmarks = ref(false)
+const showBookmarkToast = ref(false)
+const bookmarkToastMessage = ref('')
 const isIos = ref(navigator.userAgent.match(/(iPod|iPhone|iPad)/))
 
 const store = useAppStore()
 let dateTimer = null
+let bookmarkToastTimer = null
 
 const selectedContent = computed(() => store.activeDevotional || {})
 const effectiveDate = computed(() => store.effectiveDate)
 const effectiveTime = computed(() => store.effectivePeriod)
-const bookmarkCount = computed(() => store.bookmarks.length)
 
 const isCurrentBookmarked = computed(() => {
     if (!effectiveDate.value || !effectiveTime.value) {
@@ -44,6 +44,9 @@ const theme = computed(() => {
 
     return store.theme === 'light' ? 'morning' : 'evening'
 })
+
+const activeTheme = computed(() => (theme.value === 'morning' ? morningTheme : eveningTheme))
+const themeCssVariables = computed(() => themeToCssVariables(activeTheme.value))
 
 onBeforeMount(() => {
     store.initializeDateContext()
@@ -64,6 +67,10 @@ onMounted(() => {
 onUnmounted(() => {
     if (dateTimer) {
         clearInterval(dateTimer)
+    }
+
+    if (bookmarkToastTimer) {
+        clearTimeout(bookmarkToastTimer)
     }
 })
 
@@ -111,6 +118,12 @@ function openBookmarksPanel() {
     showBookmarks.value = true
 }
 
+function openSettingsPanel() {
+    closeNavigationPanels()
+    showAbout.value = false
+    showMenu.value = true
+}
+
 function openSearchResult(item) {
     store.openDevotional(item.date, item.time)
     showSearch.value = false
@@ -135,7 +148,25 @@ function toggleBookmark() {
         return
     }
 
+    const wasBookmarked = store.isBookmarked(effectiveDate.value, effectiveTime.value)
     store.toggleBookmark(effectiveDate.value, effectiveTime.value)
+
+    if (!wasBookmarked) {
+        showSavedToast('Saved to favorites')
+    }
+}
+
+function showSavedToast(message) {
+    bookmarkToastMessage.value = message
+    showBookmarkToast.value = true
+
+    if (bookmarkToastTimer) {
+        clearTimeout(bookmarkToastTimer)
+    }
+
+    bookmarkToastTimer = setTimeout(() => {
+        showBookmarkToast.value = false
+    }, 1700)
 }
 
 function openBookmarkItem(item) {
@@ -159,26 +190,27 @@ function setAppTheme(nextTheme) {
 }
 
 function setStatusBarTheme() {
-    let color
-
-    if (store.theme === 'auto') {
-        color = effectiveTime.value === 'am' ? dayColor : nightColor
-    } else if (store.theme === 'light') {
-        color = dayColor
-    } else {
-        color = nightColor
-    }
+    const color = activeTheme.value.background
 
     const metaTheme = document.querySelector('meta[name="theme-color"]')
     if (metaTheme) {
         metaTheme.setAttribute('content', color)
+    }
+
+    // Keep root backgrounds in sync so iOS status area never falls back to white.
+    document.documentElement.style.backgroundColor = color
+    document.body.style.backgroundColor = color
+
+    const appRoot = document.getElementById('app')
+    if (appRoot) {
+        appRoot.style.backgroundColor = color
     }
 }
 </script>
 
 <template>
     <LoadingOverlay :loading="isLoading" :time="effectiveTime"/>
-    <div v-if="!isLoading" class="app-scene" :class="theme">
+    <div v-if="!isLoading" class="app-scene" :class="theme" :style="themeCssVariables">
         <div class="scene-shape shape-a"></div>
         <div class="scene-shape shape-b"></div>
         <div class="scene-shape shape-c"></div>
@@ -188,24 +220,21 @@ function setStatusBarTheme() {
                 v-if="effectiveDate"
                 :date="effectiveDate"
                 :time="effectiveTime"
-                :show-menu="showMenu"
-                :show-about="showAbout"
-                @toggle-menu="toggleMenu"
+                :is-bookmarked="isCurrentBookmarked"
+                @toggle-bookmark="toggleBookmark"
                 @toggle-about="toggleAbout"
             />
             <Body
                 v-if="selectedContent.body"
                 :content="selectedContent"
-                :is-bookmarked="isCurrentBookmarked"
-                @toggle-bookmark="toggleBookmark"
             />
             <FooterControlBar
                 :current-period="effectiveTime"
-                :bookmark-count="bookmarkCount"
                 @open-search="openSearchPanel"
                 @open-date="openDatePanel"
-                @open-bookmarks="openBookmarksPanel"
                 @toggle-period="togglePeriodQuick"
+                @open-settings="openSettingsPanel"
+                @open-bookmarks="openBookmarksPanel"
             />
             <MobileMenu
                 id="mobileMenu"
@@ -229,6 +258,7 @@ function setStatusBarTheme() {
             />
             <DatePickerPanel
                 :show="showDatePicker"
+                :available-dates="store.availableDates"
                 :current-date="effectiveDate"
                 :current-period="effectiveTime"
                 @close="showDatePicker = false"
@@ -242,6 +272,9 @@ function setStatusBarTheme() {
                 @open-bookmark="openBookmarkItem"
                 @clear-bookmarks="clearBookmarks"
             />
+        </div>
+        <div class="bookmark-toast" :class="showBookmarkToast ? 'is-visible' : ''" role="status" aria-live="polite">
+            {{ bookmarkToastMessage }}
         </div>
         <div class="modal transition-all" :class="showAbout ? '-translate-x-0' : '-translate-x-full'">
             <button class="modal-close" @click="toggleAbout" aria-label="Close about dialog">×</button>
@@ -268,14 +301,8 @@ body {
 }
 
 .app-scene {
-    --scene-bg: #eee8df;
-    --card-bg: #f3f5f6;
-    --ink: #1d2330;
-    --muted: #6c7786;
-    --accent: #a8c9d2;
-    --accent-deep: #7aa8b7;
     --safe-bottom: env(safe-area-inset-bottom, 0px);
-    --control-bar-height: 58px;
+    --control-bar-height: 64px;
     min-height: 100dvh;
     position: relative;
     display: flex;
@@ -283,8 +310,9 @@ body {
     align-items: center;
     overflow: hidden;
     overflow-x: clip;
-    background: radial-gradient(circle at 20% 20%, #f7f1e8 0%, var(--scene-bg) 60%);
+    background: radial-gradient(circle at 20% 20%, var(--header-gradient-start) 0%, var(--background) 60%);
     padding: 0;
+    color: var(--text-primary);
 }
 
 .scene-shape {
@@ -298,7 +326,7 @@ body {
 .shape-a {
     width: 18rem;
     height: 18rem;
-    background: #d9ebef;
+    background: color-mix(in srgb, var(--accent-secondary) 35%, transparent);
     left: -4rem;
     top: -4rem;
 }
@@ -306,7 +334,7 @@ body {
 .shape-b {
     width: 22rem;
     height: 22rem;
-    background: #f2ddc7;
+    background: color-mix(in srgb, var(--accent-primary) 24%, transparent);
     right: -7rem;
     bottom: -8rem;
 }
@@ -314,7 +342,7 @@ body {
 .shape-c {
     width: 14rem;
     height: 14rem;
-    background: #dce2d4;
+    background: color-mix(in srgb, var(--highlight) 35%, transparent);
     right: 8%;
     top: 10%;
 }
@@ -328,8 +356,8 @@ body {
     z-index: 2;
     border-radius: 0;
     border: 0;
-    background: var(--card-bg);
-    box-shadow: 0 18px 42px rgba(48, 55, 70, 0.16), inset 0 0 0 1px rgba(121, 152, 166, 0.18);
+    background: var(--surface-secondary);
+    box-shadow: 0 18px 42px rgba(16, 24, 36, 0.18), inset 0 0 0 1px var(--border);
     overflow: hidden;
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
@@ -344,8 +372,8 @@ body {
     z-index: 30;
     overflow: auto;
     padding: 2rem;
-    background: #ffffff;
-    color: var(--ink);
+    background: var(--surface);
+    color: var(--text-primary);
     box-shadow: 0 20px 45px rgba(22, 25, 32, 0.22);
 }
 
@@ -357,8 +385,8 @@ body {
     height: 2.2rem;
     border: 0;
     border-radius: 999px;
-    background: #e2e8ee;
-    color: #2a3a4b;
+    background: var(--button-secondary-background);
+    color: var(--button-secondary-text);
     font-size: 1.45rem;
     line-height: 1;
     display: inline-flex;
@@ -367,18 +395,28 @@ body {
     cursor: pointer;
 }
 
-.morning {
-    --scene-bg: #ebe6dd;
-    --card-bg: #f5f7f8;
-    --accent: #a7c8d1;
-    --accent-deep: #78a6b4;
+.bookmark-toast {
+    position: absolute;
+    left: 50%;
+    bottom: calc(var(--control-bar-height, 64px) + env(safe-area-inset-bottom, 0px) + 0.75rem);
+    transform: translate(-50%, 10px);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 35;
+    background: color-mix(in srgb, var(--surface) 92%, var(--surface-secondary));
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.46rem 0.8rem;
+    font-size: 0.82rem;
+    letter-spacing: 0.015em;
+    box-shadow: 0 9px 20px rgba(16, 24, 36, 0.22);
+    transition: opacity 170ms ease, transform 170ms ease;
 }
 
-.evening {
-    --scene-bg: #ded7d0;
-    --card-bg: #ececf1;
-    --accent: #9ea9d4;
-    --accent-deep: #6674a9;
+.bookmark-toast.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
 }
 
 @media (max-width: 767px) {

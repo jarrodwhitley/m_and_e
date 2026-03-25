@@ -1,12 +1,11 @@
 <script setup>
 import {computed} from "vue";
 
-defineEmits(['toggleMenu', 'toggleAbout'])
+defineEmits(['toggleBookmark', 'toggleAbout'])
 const props = defineProps({
     date: String,
     time: String,
-    showMenu: Boolean,
-    showAbout: Boolean
+    isBookmarked: Boolean
 })
 const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June', 'July',
@@ -29,14 +28,14 @@ function getMonthName(date) {
 </script>
 
 <template>
-    <header class="reader-header" :class="[props.showMenu ? 'show-menu' : '']">
+    <header class="reader-header">
         <button class="logo-button" @click="$emit('toggleAbout')" aria-label="About this app">
             <img class="logo-mark" src="/assets/spurgeon_icon.png" alt="Spurgeon logo"/>
         </button>
         <div class="date" v-text="headerTitle"></div>
-        <button class="icon-button" :class="props.showMenu ? 'icon-button-active' : ''" @click="$emit('toggleMenu')"
-                :aria-label="props.showMenu ? 'Close settings' : 'Open settings'">
-            <img class="icon" src="../assets/gear-solid.svg" alt="Settings"/>
+        <button class="icon-button" :class="props.isBookmarked ? 'icon-button-active' : ''" @click="$emit('toggleBookmark')"
+                :aria-label="props.isBookmarked ? 'Remove from favorites' : 'Save this devotional'">
+            <span class="material-symbols-rounded save-icon" aria-hidden="true">{{ props.isBookmarked ? 'bookmark_remove' : 'bookmark_add' }}</span>
         </button>
     </header>
 </template>
@@ -51,11 +50,12 @@ function getMonthName(date) {
     align-items: center;
     grid-template-columns: 3rem 1fr 3rem;
     gap: 0.6rem;
+    background: linear-gradient(180deg, var(--header-gradient-start) 0%, var(--background) 60%);
 }
 
 .date {
     text-align: center;
-    color: #5f707e;
+    color: var(--text-secondary);
     font-size: clamp(1rem, 2.8vw, 1.22rem);
     letter-spacing: 0.03em;
     font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
@@ -70,13 +70,18 @@ function getMonthName(date) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #dceaf0;
-    color: #28414a;
+    background: var(--button-secondary-background);
+    color: var(--button-secondary-text);
     cursor: pointer;
 }
 
+.icon-button {
+    background: transparent;
+    border-radius: 0;
+}
+
 .logo-button {
-    box-shadow: inset 0 0 0 2px rgba(120, 166, 180, 0.25);
+    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--accent-secondary) 60%, transparent);
 }
 
 .logo-mark {
@@ -85,13 +90,15 @@ function getMonthName(date) {
     opacity: 0.9;
 }
 
-.icon {
-    width: 0.9rem;
-    height: 0.9rem;
+.save-icon {
+    font-size: 1.52rem;
+    line-height: 1;
+    font-variation-settings: 'FILL' 0, 'wght' 700, 'GRAD' 0, 'opsz' 40;
 }
 
 .icon-button-active {
-    background: #afc6d4;
+    background: transparent;
+    color: var(--accent-primary);
 }
 
 @media (min-width: 768px) {

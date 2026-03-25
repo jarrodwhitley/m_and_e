@@ -17,10 +17,10 @@ const props = defineProps({
 <style lang="scss" scoped>
 #loadingOverlay {
     &.morning {
-        background-image: url('/assets/header_morning_bg.png');
+        background: linear-gradient(180deg, var(--header-gradient-start, #FCEFD8) 0%, var(--background, #F7F4ED) 70%);
     }
     &.evening {
-        background-image: url('/assets/header_evening_bg.png');
+        background: linear-gradient(180deg, var(--header-gradient-start, #1A2433) 0%, var(--background, #0F1722) 70%);
     }
 }
 @keyframes grow {
