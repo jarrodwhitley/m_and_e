@@ -51,6 +51,11 @@ function openPreview() {
 
     emit('open-result', previewItem.value)
 }
+
+function quoteVerse(text) {
+    const normalized = String(text || '').trim().replace(/^"+|"+$/g, '')
+    return normalized ? `"${normalized}"` : ''
+}
 </script>
 
 <template>
@@ -80,13 +85,15 @@ function openPreview() {
                     @click="selectPreview(item)"
                 >
                     <span class="result-date">{{ item.date }} {{ item.time.toUpperCase() }}</span>
-                    <span class="result-verse">{{ item.keyverse }}</span>
+                    <span class="result-verse">{{ quoteVerse(item.keyverse) }}</span>
+                    <span class="result-ref" v-if="item.verseRef">{{ item.verseRef }}</span>
                 </button>
             </div>
 
             <div v-if="previewItem" class="preview-box">
                 <h3>Preview</h3>
-                <p class="preview-verse">{{ previewItem.keyverse }}</p>
+                <p class="preview-verse">{{ quoteVerse(previewItem.keyverse) }}</p>
+                <p class="preview-ref" v-if="previewItem.verseRef">{{ previewItem.verseRef }}</p>
                 <p class="preview-text">{{ previewItem.preview }}</p>
                 <button class="open-btn" @click="openPreview">Open Devotional</button>
             </div>
@@ -216,6 +223,11 @@ function openPreview() {
     color: var(--text-primary);
 }
 
+.result-ref {
+    font-size: 0.74rem;
+    color: var(--text-muted, var(--text-secondary));
+}
+
 .preview-box {
     margin-top: 0.65rem;
     border-radius: 0.9rem;
@@ -237,6 +249,12 @@ function openPreview() {
     font-size: 0.84rem;
     color: var(--text-primary);
     font-weight: 600;
+}
+
+.preview-ref {
+    margin: 0.2rem 0 0;
+    font-size: 0.76rem;
+    color: var(--text-muted, var(--text-secondary));
 }
 
 .preview-text {

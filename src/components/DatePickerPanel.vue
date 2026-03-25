@@ -82,6 +82,17 @@ function initializeSelectedDate() {
     selectedDay.value = firstDay ? String(firstDay) : ''
 }
 
+function emitSelectedDevotional() {
+    if (!selectedMonth.value || !selectedDay.value) {
+        return
+    }
+
+    emit('select-date', {
+        date: `${Number(selectedMonth.value)}-${Number(selectedDay.value)}`,
+        period: selectedPeriod.value
+    })
+}
+
 watch(() => props.show, (isOpen) => {
     if (!isOpen) {
         return
@@ -112,19 +123,17 @@ const prettyDate = computed(() => {
     return `${monthName} ${Number(selectedDay.value)}`
 })
 
-function selectDevotional() {
-    if (!selectedMonth.value || !selectedDay.value) {
-        return
-    }
-
-    emit('select-date', {
-        date: `${Number(selectedMonth.value)}-${Number(selectedDay.value)}`,
-        period: selectedPeriod.value
-    })
-}
-
 function chooseToday() {
     emit('go-today')
+}
+
+function onDayChange() {
+    emitSelectedDevotional()
+}
+
+function onPeriodChange(period) {
+    selectedPeriod.value = period
+    emitSelectedDevotional()
 }
 </script>
 
@@ -145,7 +154,7 @@ function chooseToday() {
                         {{ monthNames[month - 1] }}
                     </option>
                 </select>
-                <select id="devotional-day" v-model="selectedDay" class="date-select">
+                <select id="devotional-day" v-model="selectedDay" class="date-select" @change="onDayChange">
                     <option v-for="day in dayOptions" :key="day" :value="String(day)">
                         {{ day }}
                     </option>
@@ -153,15 +162,14 @@ function chooseToday() {
             </div>
 
             <div class="period-row">
-                <button class="period-btn" :class="selectedPeriod === 'am' ? 'selected' : ''" @click="selectedPeriod = 'am'">Morning</button>
-                <button class="period-btn" :class="selectedPeriod === 'pm' ? 'selected' : ''" @click="selectedPeriod = 'pm'">Evening</button>
+                <button class="period-btn" :class="selectedPeriod === 'am' ? 'selected' : ''" @click="onPeriodChange('am')">Morning</button>
+                <button class="period-btn" :class="selectedPeriod === 'pm' ? 'selected' : ''" @click="onPeriodChange('pm')">Evening</button>
             </div>
 
             <p class="preview">{{ prettyDate }} • {{ selectedPeriod === 'am' ? 'Morning' : 'Evening' }}</p>
 
             <div class="action-row">
                 <button class="secondary-btn" @click="chooseToday">Go To Today</button>
-                <button class="primary-btn" @click="selectDevotional">Open</button>
             </div>
         </div>
     </section>
@@ -292,12 +300,11 @@ function chooseToday() {
 .action-row {
     margin-top: 0.75rem;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 0.5rem;
 }
 
-.secondary-btn,
-.primary-btn {
+.secondary-btn {
     border: 0;
     border-radius: 0.75rem;
     min-height: 2.45rem;
@@ -308,10 +315,5 @@ function chooseToday() {
     background: var(--support-row-background);
     color: var(--support-row-text);
     box-shadow: inset 0 0 0 1px var(--support-row-border);
-}
-
-.primary-btn {
-    background: var(--button-primary);
-    color: var(--button-primary-text);
 }
 </style>

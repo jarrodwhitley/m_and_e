@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { useAppStore} from "../store.js";
 
 const props = defineProps({
@@ -8,14 +8,39 @@ const props = defineProps({
 
 const store = useAppStore()
 
-const verseReference = ref('')
-const bodyContent = ref('')
+const bodyParagraphs = computed(() => {
+    const rawBody = props.content?.body
+
+    if (Array.isArray(rawBody)) {
+        return rawBody
+            .map((paragraph) => String(paragraph || '').replace(/[\u0080-\u009F]/g, '').trim())
+            .filter(Boolean)
+    }
+
+    const normalized = String(rawBody || '').replace(/[\u0080-\u009F]/g, '').trim()
+    if (!normalized) {
+        return []
+    }
+
+    return normalized
+        .split(/\n\s*\n/)
+        .map((paragraph) => paragraph.replace(/\s+/g, ' ').trim())
+        .filter(Boolean)
+})
+
+const keyVerseText = computed(() => props.content?.keyVerseNoRef || props.content?.keyverse || '')
+const verseReferenceText = computed(() => props.content?.verseRef || '')
+
+function quoteVerse(text) {
+    const normalized = String(text || '').trim().replace(/^"+|"+$/g, '')
+    return normalized ? `"${normalized}"` : ''
+}
+
+const firstParagraph = computed(() => bodyParagraphs.value[0] || '')
+const remainingParagraphs = computed(() => bodyParagraphs.value.slice(1))
 
 const bodySegments = computed(() => {
-    const rawText = bodyContent.value || ''
-    const text = rawText
-        .replace(/[\u0080-\u009F]/g, '')
-        .replace(/^\s+/, '')
+    const text = firstParagraph.value.replace(/^\s+/, '')
 
     const match = text.match(/[A-Za-z]/)
 
@@ -34,47 +59,29 @@ const bodySegments = computed(() => {
         rest: text.slice(index + 1)
     }
 })
-
-function getVerseReference(string) {
-    const parts = (string || '').split('—')
-    verseReference.value = parts[1] ? parts[1].trim() : ''
-    formatBodyContent(props.content.body)
-}
-function formatBodyContent(string) {
-    if (!string) {
-        bodyContent.value = ''
-        return
-    }
-
-    if (!verseReference.value || !string.includes(verseReference.value)) {
-        bodyContent.value = string.trim()
-        return
-    }
-
-    bodyContent.value = string.split(verseReference.value)[1].trim()
-}
-
-onMounted(() => {
-    getVerseReference(props.content.keyverse)
-})
-
-watch(() => props.content, (nextContent) => {
-    if (nextContent?.keyverse) {
-        getVerseReference(nextContent.keyverse)
-    }
-}, { deep: true })
 </script>
 
 <template>
     <section id="body" class="body-panel" :style="'font-size:'+ store.fontSize.toString() +'px;'">
-        <p class="key-verse" v-text="props.content.keyverse"></p>
-        <p class="body-copy">
-            <span v-if="bodySegments.leading" v-text="bodySegments.leading"></span><span
-                v-if="bodySegments.dropCap"
-                class="drop-cap"
-                v-text="bodySegments.dropCap"
-            ></span><span v-text="bodySegments.rest"></span>
-        </p>
+        <div class="key-verse">
+            <p class="key-verse-text" v-text="quoteVerse(keyVerseText)"></p>
+            <p class="verse-ref" v-if="verseReferenceText" v-text="verseReferenceText"></p>
+        </div>
+        <div class="body-content">
+            <p class="body-copy first-paragraph" v-if="firstParagraph">
+                <span v-if="bodySegments.leading" v-text="bodySegments.leading"></span><span
+                    v-if="bodySegments.dropCap"
+                    class="drop-cap"
+                    v-text="bodySegments.dropCap"
+                ></span><span v-text="bodySegments.rest"></span>
+            </p>
+            <p
+                v-for="(paragraph, index) in remainingParagraphs"
+                :key="`paragraph-${index}`"
+                class="body-copy indented-paragraph"
+                v-text="paragraph"
+            ></p>
+        </div>
     </section>
     <div class="desktop-warning">
         Mobile-first layout with a classic reading mode.
@@ -104,17 +111,39 @@ watch(() => props.content, (nextContent) => {
     border-bottom: 1px solid var(--border);
 }
 
+.key-verse-text,
+.verse-ref {
+    margin: 0;
+}
+
+.verse-ref {
+    margin-top: 0.12rem;
+    color: var(--text-muted, var(--text-secondary));
+    font-size: 0.92em;
+}
+
 .body-copy {
     margin: 0;
     color: var(--text-primary);
     text-align: justify;
-    text-indent: 0;
     line-height: 1.62;
     letter-spacing: 0.002em;
     text-wrap: pretty;
     overflow-wrap: anywhere;
     font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+}
+
+.body-content {
     padding: 0.9rem 1rem calc(var(--control-bar-height, 64px) + 1.15rem + env(safe-area-inset-bottom, 0px));
+}
+
+.first-paragraph {
+    text-indent: 0;
+}
+
+.indented-paragraph {
+    text-indent: 1.35em;
+    margin-top: 0.8rem;
 }
 
 .drop-cap {
@@ -133,7 +162,7 @@ watch(() => props.content, (nextContent) => {
 }
 
 @media (min-width: 1024px) {
-    .body-copy {
+    .body-content {
         padding-inline: 1.25rem;
     }
 

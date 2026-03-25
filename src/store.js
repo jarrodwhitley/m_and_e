@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import content from './assets/content.json'
+import content from './assets/content/updated_content.json'
 
 const STORAGE_KEY = 'm_and_e_bookmarks'
 
@@ -27,9 +27,17 @@ function formatPreview(text, maxLength = 170) {
     return `${normalized.slice(0, maxLength).trim()}...`
 }
 
+function normalizeBodyText(body) {
+    if (Array.isArray(body)) {
+        return body.join(' ').replace(/\s+/g, ' ').trim()
+    }
+
+    return String(body || '').replace(/\s+/g, ' ').trim()
+}
+
 function rankSearchResult(entry, needle) {
-    const verse = (entry.keyverse || '').toLowerCase()
-    const body = (entry.body || '').toLowerCase()
+    const verse = (entry.keyVerseNoRef || entry.keyverse || '').toLowerCase()
+    const body = normalizeBodyText(entry.body).toLowerCase()
 
     const verseIndex = verse.indexOf(needle)
     const bodyIndex = body.indexOf(needle)
@@ -88,8 +96,9 @@ export const useAppStore = defineStore({
                         key: bookmarkKey,
                         date,
                         time,
-                        keyverse: entry.keyverse,
-                        preview: formatPreview(entry.body)
+                        keyverse: entry.keyVerseNoRef || entry.keyverse || '',
+                        verseRef: entry.verseRef || '',
+                        preview: formatPreview(normalizeBodyText(entry.body))
                     }
                 })
                 .filter(Boolean)
@@ -200,8 +209,9 @@ export const useAppStore = defineStore({
                     key: entryKey(entry.date, entry.time),
                     date: entry.date,
                     time: entry.time,
-                    keyverse: entry.keyverse,
-                    preview: formatPreview(entry.body)
+                    keyverse: entry.keyVerseNoRef || entry.keyverse || '',
+                    verseRef: entry.verseRef || '',
+                    preview: formatPreview(normalizeBodyText(entry.body))
                 }))
 
             this.searchResults = results

@@ -29,6 +29,11 @@ function formatBookmarkDate(mdDate) {
 function formatBookmarkPeriod(time) {
     return String(time).toLowerCase() === 'pm' ? 'Evening' : 'Morning'
 }
+
+function quoteVerse(text) {
+    const normalized = String(text || '').trim().replace(/^"+|"+$/g, '')
+    return normalized ? `"${normalized}"` : ''
+}
 </script>
 
 <template>
@@ -51,7 +56,8 @@ function formatBookmarkPeriod(time) {
                     @click="emit('open-bookmark', item)"
                 >
                     <span class="bookmark-date">{{ formatBookmarkDate(item.date) }} — {{ formatBookmarkPeriod(item.time) }}</span>
-                    <span class="bookmark-verse">{{ item.keyverse }}</span>
+                    <span class="bookmark-verse">{{ quoteVerse(item.keyverse) }}</span>
+                    <span class="bookmark-ref" v-if="item.verseRef">{{ item.verseRef }}</span>
                 </button>
             </div>
 
@@ -163,6 +169,11 @@ function formatBookmarkPeriod(time) {
 .bookmark-verse {
     font-size: 0.84rem;
     color: var(--text-primary);
+}
+
+.bookmark-ref {
+    font-size: 0.76rem;
+    color: var(--text-muted, var(--text-secondary));
 }
 
 .clear-btn {
