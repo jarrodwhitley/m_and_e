@@ -8,6 +8,27 @@ defineProps({
 })
 
 const emit = defineEmits(['close', 'open-bookmark', 'clear-bookmarks'])
+
+const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+]
+
+function formatBookmarkDate(mdDate) {
+    const [rawMonth, rawDay] = String(mdDate || '').split('-')
+    const month = Number(rawMonth)
+    const day = Number(rawDay)
+
+    if (!month || !day || month < 1 || month > 12) {
+        return mdDate
+    }
+
+    return `${monthNames[month - 1]} ${day}`
+}
+
+function formatBookmarkPeriod(time) {
+    return String(time).toLowerCase() === 'pm' ? 'Evening' : 'Morning'
+}
 </script>
 
 <template>
@@ -29,7 +50,7 @@ const emit = defineEmits(['close', 'open-bookmark', 'clear-bookmarks'])
                     class="bookmark-item"
                     @click="emit('open-bookmark', item)"
                 >
-                    <span class="bookmark-date">{{ item.date }} {{ item.time.toUpperCase() }}</span>
+                    <span class="bookmark-date">{{ formatBookmarkDate(item.date) }} — {{ formatBookmarkPeriod(item.time) }}</span>
                     <span class="bookmark-verse">{{ item.keyverse }}</span>
                 </button>
             </div>
@@ -107,9 +128,10 @@ const emit = defineEmits(['close', 'open-bookmark', 'clear-bookmarks'])
     width: 2rem;
     height: 2rem;
     border-radius: 999px;
-    background: var(--button-secondary-background);
-    color: var(--button-secondary-text);
+    background: var(--support-row-background);
+    color: var(--support-row-text);
     font-size: 1.25rem;
+    box-shadow: inset 0 0 0 1px var(--support-row-border);
 }
 
 .hint {
@@ -149,8 +171,9 @@ const emit = defineEmits(['close', 'open-bookmark', 'clear-bookmarks'])
     border: 0;
     border-radius: 0.75rem;
     min-height: 2.45rem;
-    background: var(--button-secondary-background);
-    color: var(--button-secondary-text);
+    background: var(--support-row-background);
+    color: var(--support-row-text);
     font-weight: 600;
+    box-shadow: inset 0 0 0 1px var(--support-row-border);
 }
 </style>

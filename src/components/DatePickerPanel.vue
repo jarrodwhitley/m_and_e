@@ -233,9 +233,10 @@ function chooseToday() {
     width: 2rem;
     height: 2rem;
     border-radius: 999px;
-    background: var(--button-secondary-background);
-    color: var(--button-secondary-text);
+    background: var(--support-row-background);
+    color: var(--support-row-text);
     font-size: 1.25rem;
+    box-shadow: inset 0 0 0 1px var(--support-row-border);
 }
 
 .field-label {
@@ -271,8 +272,8 @@ function chooseToday() {
 .period-btn {
     border: 0;
     border-radius: 0.75rem;
-    background: var(--button-secondary-background);
-    color: var(--button-secondary-text);
+    background: var(--segmented-background);
+    color: var(--segmented-text);
     min-height: 2.4rem;
     font-weight: 600;
 }
@@ -304,8 +305,9 @@ function chooseToday() {
 }
 
 .secondary-btn {
-    background: var(--button-secondary-background);
-    color: var(--button-secondary-text);
+    background: var(--support-row-background);
+    color: var(--support-row-text);
+    box-shadow: inset 0 0 0 1px var(--support-row-border);
 }
 
 .primary-btn {

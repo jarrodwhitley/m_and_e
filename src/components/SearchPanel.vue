@@ -163,9 +163,10 @@ function openPreview() {
     width: 2rem;
     height: 2rem;
     border-radius: 999px;
-    background: var(--button-secondary-background);
-    color: var(--button-secondary-text);
+    background: var(--support-row-background);
+    color: var(--support-row-text);
     font-size: 1.25rem;
+    box-shadow: inset 0 0 0 1px var(--support-row-border);
 }
 
 .search-input {

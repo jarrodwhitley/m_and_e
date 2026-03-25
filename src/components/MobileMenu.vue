@@ -196,8 +196,8 @@ function setTextSize(size) {
     border: 0;
     border-radius: 0.7rem;
     padding: 0.55rem 0.35rem;
-    background: var(--button-secondary-background);
-    color: var(--button-secondary-text);
+    background: var(--segmented-background);
+    color: var(--segmented-text);
     font-weight: 600;
 }
 
@@ -213,8 +213,8 @@ function setTextSize(size) {
 }
 
 .font-size-pill {
-    background: var(--highlight);
-    color: var(--selected-text);
+    background: var(--text-size-badge-background);
+    color: var(--text-size-badge-text);
     border-radius: 999px;
     padding: 0.12rem 0.58rem;
     font-size: 0.85rem;
@@ -230,8 +230,8 @@ function setTextSize(size) {
 .font-preset-btn {
     border: 0;
     border-radius: 0.72rem;
-    background: var(--button-secondary-background);
-    color: var(--button-secondary-text);
+    background: var(--segmented-background);
+    color: var(--segmented-text);
     min-height: 2.5rem;
     font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
 }
@@ -264,11 +264,11 @@ function setTextSize(size) {
 
 .menu-link {
     text-decoration: none;
-    color: var(--button-secondary-text);
-    background: var(--button-secondary-background);
+    color: var(--support-row-text);
+    background: var(--support-row-background);
     border-radius: 0.75rem;
     padding: 0.58rem 0.7rem;
-    box-shadow: inset 0 0 0 1px var(--border);
+    box-shadow: inset 0 0 0 1px var(--support-row-border);
 }
 
 @media (min-width: 768px) {
