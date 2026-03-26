@@ -317,8 +317,6 @@ body,
 #app {
     height: 100%;
     min-height: 100%;
-    overflow: hidden;
-    overscroll-behavior: none;
 }
 
 body {

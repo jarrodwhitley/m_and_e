@@ -45,6 +45,7 @@ defineEmits(['open-search', 'open-date', 'toggle-period', 'open-bookmarks', 'ope
     background: color-mix(in srgb, var(--surface-secondary) 88%, transparent);
     backdrop-filter: blur(8px);
     padding: 0.15rem 0.2rem env(safe-area-inset-bottom, 0px);
+    touch-action: none;
 }
 
 .control-btn {

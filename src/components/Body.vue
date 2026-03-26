@@ -141,6 +141,7 @@ function isFirstParagraph(index, section) {
     color: var(--text-primary);
     overflow: auto;
     overflow-x: hidden;
+    overscroll-behavior: contain;
     text-align: left;
     flex: 1;
     min-height: 0;
