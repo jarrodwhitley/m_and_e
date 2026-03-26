@@ -37,17 +37,14 @@ defineEmits(['open-search', 'open-date', 'toggle-period', 'open-bookmarks', 'ope
 
 <style scoped>
 .control-bar {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    flex-shrink: 0;
     z-index: 18;
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     border-top: 1px solid var(--border);
     background: color-mix(in srgb, var(--surface-secondary) 88%, transparent);
     backdrop-filter: blur(8px);
-    padding: 0.15rem 0.2rem max(env(safe-area-inset-bottom, 0px), 0.38rem);
+    padding: 0.15rem 0.2rem env(safe-area-inset-bottom, 0px);
 }
 
 .control-btn {

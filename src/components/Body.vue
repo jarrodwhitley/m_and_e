@@ -8,12 +8,34 @@ const props = defineProps({
 
 const store = useAppStore()
 
-const bodyParagraphs = computed(() => {
+const bodySections = computed(() => {
     const rawBody = props.content?.body
 
     if (Array.isArray(rawBody)) {
         return rawBody
-            .map((paragraph) => String(paragraph || '').replace(/[\u0080-\u009F]/g, '').trim())
+            .map((item) => {
+                if (item && typeof item === 'object') {
+                    const content = String(item.content || '').replace(/[\u0080-\u009F]/g, '').trim()
+                    if (!content) {
+                        return null
+                    }
+
+                    return {
+                        type: item.type === 'poetry' ? 'poetry' : 'paragraph',
+                        content
+                    }
+                }
+
+                const content = String(item || '').replace(/[\u0080-\u009F]/g, '').trim()
+                if (!content) {
+                    return null
+                }
+
+                return {
+                    type: 'paragraph',
+                    content
+                }
+            })
             .filter(Boolean)
     }
 
@@ -22,10 +44,15 @@ const bodyParagraphs = computed(() => {
         return []
     }
 
-    return normalized
+    const paragraphs = normalized
         .split(/\n\s*\n/)
         .map((paragraph) => paragraph.replace(/\s+/g, ' ').trim())
         .filter(Boolean)
+
+    return paragraphs.map((content) => ({
+        type: 'paragraph',
+        content
+    }))
 })
 
 const keyVerseText = computed(() => props.content?.keyVerseNoRef || props.content?.keyverse || '')
@@ -36,8 +63,15 @@ function quoteVerse(text) {
     return normalized ? `"${normalized}"` : ''
 }
 
-const firstParagraph = computed(() => bodyParagraphs.value[0] || '')
-const remainingParagraphs = computed(() => bodyParagraphs.value.slice(1))
+const firstParagraphIndex = computed(() => bodySections.value.findIndex((section) => section.type === 'paragraph'))
+
+const firstParagraph = computed(() => {
+    if (firstParagraphIndex.value < 0) {
+        return ''
+    }
+
+    return bodySections.value[firstParagraphIndex.value]?.content || ''
+})
 
 const bodySegments = computed(() => {
     const text = firstParagraph.value.replace(/^\s+/, '')
@@ -59,6 +93,10 @@ const bodySegments = computed(() => {
         rest: text.slice(index + 1)
     }
 })
+
+function isFirstParagraph(index, section) {
+    return section.type === 'paragraph' && index === firstParagraphIndex.value
+}
 </script>
 
 <template>
@@ -68,19 +106,27 @@ const bodySegments = computed(() => {
             <p class="verse-ref" v-if="verseReferenceText" v-text="verseReferenceText"></p>
         </div>
         <div class="body-content">
-            <p class="body-copy first-paragraph" v-if="firstParagraph">
-                <span v-if="bodySegments.leading" v-text="bodySegments.leading"></span><span
-                    v-if="bodySegments.dropCap"
-                    class="drop-cap"
-                    v-text="bodySegments.dropCap"
-                ></span><span v-text="bodySegments.rest"></span>
-            </p>
             <p
-                v-for="(paragraph, index) in remainingParagraphs"
-                :key="`paragraph-${index}`"
-                class="body-copy indented-paragraph"
-                v-text="paragraph"
-            ></p>
+                v-for="(section, index) in bodySections"
+                :key="`section-${index}`"
+                class="body-copy"
+                :class="{
+                    'first-paragraph': isFirstParagraph(index, section),
+                    'indented-paragraph': section.type === 'paragraph' && !isFirstParagraph(index, section),
+                    'poetry-paragraph': section.type === 'poetry'
+                }"
+            >
+                <template v-if="isFirstParagraph(index, section)">
+                    <span v-if="bodySegments.leading" v-text="bodySegments.leading"></span><span
+                        v-if="bodySegments.dropCap"
+                        class="drop-cap"
+                        v-text="bodySegments.dropCap"
+                    ></span><span v-text="bodySegments.rest"></span>
+                </template>
+                <template v-else>
+                    <span v-text="section.content"></span>
+                </template>
+            </p>
         </div>
     </section>
     <div class="desktop-warning">
@@ -96,6 +142,7 @@ const bodySegments = computed(() => {
     overflow: auto;
     overflow-x: hidden;
     text-align: left;
+    flex: 1;
     min-height: 0;
 }
 
@@ -114,6 +161,7 @@ const bodySegments = computed(() => {
 .key-verse-text,
 .verse-ref {
     margin: 0;
+    text-indent: 0;
 }
 
 .verse-ref {
@@ -134,7 +182,7 @@ const bodySegments = computed(() => {
 }
 
 .body-content {
-    padding: 0.9rem 1rem calc(var(--control-bar-height, 64px) + 1.15rem + env(safe-area-inset-bottom, 0px));
+    padding: 0.9rem 1rem 1rem;
 }
 
 .first-paragraph {
@@ -143,12 +191,23 @@ const bodySegments = computed(() => {
 
 .indented-paragraph {
     text-indent: 1.35em;
-    margin-top: 0.8rem;
+}
+
+.poetry-paragraph {
+    text-indent: 0;
+    text-align: justify;
+    font-style: italic;
+    white-space: pre-line;
+    background: color-mix(in srgb, var(--surface) 86%, var(--support-row-background, var(--surface-secondary)) 14%);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent-primary);
+    padding: 0.75rem 0.8rem;
+    margin-top: 0.55rem;
 }
 
 .drop-cap {
     float: left;
-    font-size: 3.1em;
+    font-size: 3.7em;
     line-height: 0.68;
     margin-right: 0.165em;
     margin-left: -0.015em;

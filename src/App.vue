@@ -17,6 +17,7 @@ const showAbout = ref(false)
 const showSearch = ref(false)
 const showDatePicker = ref(false)
 const showBookmarks = ref(false)
+const showClearBookmarksConfirm = ref(false)
 const showBookmarkToast = ref(false)
 const bookmarkToastMessage = ref('')
 const isIos = ref(navigator.userAgent.match(/(iPod|iPhone|iPad)/))
@@ -179,9 +180,16 @@ function clearBookmarks() {
         return
     }
 
-    if (window.confirm('Clear all saved devotionals?')) {
-        store.clearBookmarks()
-    }
+    showClearBookmarksConfirm.value = true
+}
+
+function cancelClearBookmarks() {
+    showClearBookmarksConfirm.value = false
+}
+
+function confirmClearBookmarks() {
+    store.clearBookmarks()
+    showClearBookmarksConfirm.value = false
 }
 
 function setAppTheme(nextTheme) {
@@ -190,20 +198,23 @@ function setAppTheme(nextTheme) {
 }
 
 function setStatusBarTheme() {
-    const color = activeTheme.value.background
+    const pageColor = activeTheme.value.background
+    const statusBarColor = theme.value === 'morning'
+        ? (activeTheme.value.accentPrimary || pageColor)
+        : pageColor
 
     const metaTheme = document.querySelector('meta[name="theme-color"]')
     if (metaTheme) {
-        metaTheme.setAttribute('content', color)
+        metaTheme.setAttribute('content', statusBarColor)
     }
 
     // Keep root backgrounds in sync so iOS status area never falls back to white.
-    document.documentElement.style.backgroundColor = color
-    document.body.style.backgroundColor = color
+    document.documentElement.style.backgroundColor = pageColor
+    document.body.style.backgroundColor = pageColor
 
     const appRoot = document.getElementById('app')
     if (appRoot) {
-        appRoot.style.backgroundColor = color
+        appRoot.style.backgroundColor = pageColor
     }
 }
 </script>
@@ -276,6 +287,15 @@ function setStatusBarTheme() {
         <div class="bookmark-toast" :class="showBookmarkToast ? 'is-visible' : ''" role="status" aria-live="polite">
             {{ bookmarkToastMessage }}
         </div>
+        <div v-if="showClearBookmarksConfirm" class="confirm-overlay" @click="cancelClearBookmarks">
+            <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="clear-bookmarks-title" @click.stop>
+                <h2 id="clear-bookmarks-title">Clear all saved devotionals?</h2>
+                <div class="confirm-actions">
+                    <button class="confirm-btn cancel" @click="cancelClearBookmarks">Cancel</button>
+                    <button class="confirm-btn confirm" @click="confirmClearBookmarks">Clear All</button>
+                </div>
+            </div>
+        </div>
         <div class="modal transition-all" :class="showAbout ? '-translate-x-0' : '-translate-x-full'">
             <button class="modal-close" @click="toggleAbout" aria-label="Close about dialog">×</button>
             <img class="w-20 mx-auto" src="/assets/spurgeon_icon.png" alt="spurgeon icon black"/>
@@ -292,24 +312,35 @@ function setStatusBarTheme() {
 </template>
 
 <style lang="scss">
+html,
+body,
+#app {
+    height: 100%;
+    min-height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+
 body {
-    overflow: auto;
-    overflow-x: hidden;
-    touch-action: manipulation;
     margin: 0;
+    touch-action: manipulation;
     font-family: "Avenir Next", "Segoe UI", sans-serif;
 }
 
+#app {
+    display: flex;
+}
+
 .app-scene {
+    --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --control-bar-height: 64px;
+    min-height: 100vh;
     min-height: 100dvh;
-    position: relative;
+    width: 100%;
     display: flex;
     justify-content: center;
-    align-items: center;
     overflow: hidden;
-    overflow-x: clip;
     background: radial-gradient(circle at 20% 20%, var(--header-gradient-start) 0%, var(--background) 60%);
     padding: 0;
     color: var(--text-primary);
@@ -350,8 +381,8 @@ body {
 .reader-shell {
     width: 100%;
     max-width: 28rem;
+    min-height: 100vh;
     min-height: 100dvh;
-    max-height: 100dvh;
     position: relative;
     z-index: 2;
     border-radius: 0;
@@ -359,8 +390,8 @@ body {
     background: var(--surface-secondary);
     box-shadow: 0 18px 42px rgba(16, 24, 36, 0.18), inset 0 0 0 1px var(--border);
     overflow: hidden;
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
+    display: flex;
+    flex-direction: column;
 }
 
 .modal {
@@ -398,8 +429,8 @@ body {
 .bookmark-toast {
     position: absolute;
     left: 50%;
-    bottom: calc(var(--control-bar-height, 64px) + env(safe-area-inset-bottom, 0px) + 0.75rem);
-    transform: translate(-50%, 10px);
+    top: calc(var(--safe-top, 0px) + 0.75rem);
+    transform: translate(-50%, -10px);
     opacity: 0;
     pointer-events: none;
     z-index: 35;
@@ -417,6 +448,59 @@ body {
 .bookmark-toast.is-visible {
     opacity: 1;
     transform: translate(-50%, 0);
+}
+
+.confirm-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 36;
+    background: var(--overlay-background);
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+}
+
+.confirm-dialog {
+    width: min(100%, 21rem);
+    background: var(--surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    box-shadow: 0 16px 34px rgba(16, 24, 36, 0.3);
+    padding: 1rem;
+}
+
+.confirm-dialog h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.confirm-actions {
+    margin-top: 0.9rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.55rem;
+}
+
+.confirm-btn {
+    border: 0;
+    border-radius: 0.7rem;
+    min-height: 2.25rem;
+    padding: 0.4rem 0.75rem;
+    font-weight: 600;
+}
+
+.confirm-btn.cancel {
+    background: var(--support-row-background, var(--button-secondary-background));
+    color: var(--support-row-text, var(--button-secondary-text));
+    box-shadow: inset 0 0 0 1px var(--support-row-border, var(--border));
+}
+
+.confirm-btn.confirm {
+    background: var(--button-primary);
+    color: var(--button-primary-text);
 }
 
 @media (max-width: 767px) {

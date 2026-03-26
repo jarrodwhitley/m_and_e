@@ -56,6 +56,20 @@ function quoteVerse(text) {
     const normalized = String(text || '').trim().replace(/^"+|"+$/g, '')
     return normalized ? `"${normalized}"` : ''
 }
+
+const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+]
+
+function formatDatePeriod(date, time) {
+    const [rawMonth, rawDay] = String(date || '').split('-')
+    const month = Number(rawMonth)
+    const day = Number(rawDay)
+    const monthLabel = month >= 1 && month <= 12 ? monthNames[month - 1] : date
+    const period = String(time).toLowerCase() === 'pm' ? 'Evening' : 'Morning'
+    return `${monthLabel} ${day} — ${period}`
+}
 </script>
 
 <template>
@@ -84,9 +98,12 @@ function quoteVerse(text) {
                     :class="item.key === previewKey ? 'selected' : ''"
                     @click="selectPreview(item)"
                 >
-                    <span class="result-date">{{ item.date }} {{ item.time.toUpperCase() }}</span>
+                    <span class="result-date">{{ formatDatePeriod(item.date, item.time) }}</span>
                     <span class="result-verse">{{ quoteVerse(item.keyverse) }}</span>
                     <span class="result-ref" v-if="item.verseRef">{{ item.verseRef }}</span>
+                    <div class="result-tags" v-if="item.tags?.length">
+                        <span class="tag-pill" v-for="tag in item.tags" :key="`${item.key}-${tag}`">{{ tag }}</span>
+                    </div>
                 </button>
             </div>
 
@@ -190,6 +207,7 @@ function quoteVerse(text) {
     color: var(--text-secondary);
     font-size: 0.85rem;
     margin: 0.7rem 0 0.5rem;
+    text-indent: 0;
 }
 
 .results-list {
@@ -226,6 +244,24 @@ function quoteVerse(text) {
 .result-ref {
     font-size: 0.74rem;
     color: var(--text-muted, var(--text-secondary));
+}
+
+.result-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.32rem;
+    margin-top: 0.18rem;
+}
+
+.tag-pill {
+    font-size: 0.69rem;
+    line-height: 1;
+    padding: 0.24rem 0.4rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--support-row-background, var(--surface-secondary)) 88%, var(--surface) 12%);
+    color: var(--support-row-text, var(--text-secondary));
+    border: 1px solid var(--support-row-border, var(--border));
+    text-transform: capitalize;
 }
 
 .preview-box {

@@ -46,7 +46,7 @@ function quoteVerse(text) {
                 <button class="close-btn" @click="emit('close')" aria-label="Close bookmarks">×</button>
             </div>
 
-            <p v-if="!bookmarks.length" class="hint">No bookmarks yet. Tap the star in any devotional to save it.</p>
+            <p v-if="!bookmarks.length" class="hint">No bookmarks yet. Tap the bookmark icon in the top right in any devotional to save it.</p>
 
             <div v-else class="bookmark-list">
                 <button
@@ -144,6 +144,7 @@ function quoteVerse(text) {
     margin: 0.4rem 0;
     color: var(--text-secondary);
     font-size: 0.85rem;
+    text-indent: 0;
 }
 
 .bookmark-list {

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import content from './assets/content/updated_content.json'
+import content from './assets/content/content.json'
 
 const STORAGE_KEY = 'm_and_e_bookmarks'
 
@@ -29,7 +29,17 @@ function formatPreview(text, maxLength = 170) {
 
 function normalizeBodyText(body) {
     if (Array.isArray(body)) {
-        return body.join(' ').replace(/\s+/g, ' ').trim()
+        return body
+            .map((item) => {
+                if (item && typeof item === 'object') {
+                    return String(item.content || '')
+                }
+
+                return String(item || '')
+            })
+            .join(' ')
+            .replace(/\s+/g, ' ')
+            .trim()
     }
 
     return String(body || '').replace(/\s+/g, ' ').trim()
@@ -38,16 +48,24 @@ function normalizeBodyText(body) {
 function rankSearchResult(entry, needle) {
     const verse = (entry.keyVerseNoRef || entry.keyverse || '').toLowerCase()
     const body = normalizeBodyText(entry.body).toLowerCase()
+    const topics = Array.isArray(entry.topics)
+        ? entry.topics.map((topic) => String(topic || '').toLowerCase()).join(' ')
+        : ''
 
     const verseIndex = verse.indexOf(needle)
     const bodyIndex = body.indexOf(needle)
+    const topicIndex = topics.indexOf(needle)
 
-    if (verseIndex === -1 && bodyIndex === -1) {
+    if (verseIndex === -1 && bodyIndex === -1 && topicIndex === -1) {
         return Number.POSITIVE_INFINITY
     }
 
     if (verseIndex !== -1) {
         return verseIndex
+    }
+
+    if (topicIndex !== -1) {
+        return 500 + topicIndex
     }
 
     return 1000 + bodyIndex
@@ -211,6 +229,7 @@ export const useAppStore = defineStore({
                     time: entry.time,
                     keyverse: entry.keyVerseNoRef || entry.keyverse || '',
                     verseRef: entry.verseRef || '',
+                    tags: Array.isArray(entry.topics) ? entry.topics : [],
                     preview: formatPreview(normalizeBodyText(entry.body))
                 }))
 

@@ -44,13 +44,25 @@ function getMonthName(date) {
 .reader-header {
     position: relative;
     z-index: 20;
-    height: 78px;
-    padding: 0.9rem 1rem 0.8rem;
+    --safe-top: env(safe-area-inset-top, 0px);
+    height: calc(78px + var(--safe-top));
+    padding: calc(0.9rem + var(--safe-top)) 1rem 0.8rem;
     display: grid;
     align-items: center;
     grid-template-columns: 3rem 1fr 3rem;
     gap: 0.6rem;
     background: linear-gradient(180deg, var(--header-gradient-start) 0%, var(--background) 60%);
+}
+
+.reader-header::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: var(--safe-top);
+    background: var(--status-top-strip-color, var(--background));
+    pointer-events: none;
 }
 
 .date {
