@@ -1,5 +1,6 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
+import { useSwipeToClose } from '../composables/useSwipeToClose'
 
 const props = defineProps({
     show: Boolean,
@@ -15,41 +16,18 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'update-query', 'open-result'])
 
-const previewKey = ref('')
 const localQuery = ref(props.query)
 
 watch(() => props.query, (nextQuery) => {
     localQuery.value = nextQuery
 })
 
-watch(() => props.show, (isOpen) => {
-    if (!isOpen) {
-        previewKey.value = ''
-    }
-})
-
-watch(() => props.results, (nextResults) => {
-    if (!nextResults.find((item) => item.key === previewKey.value)) {
-        previewKey.value = ''
-    }
-})
-
-const previewItem = computed(() => props.results.find((item) => item.key === previewKey.value) || null)
-
 function onQueryInput() {
     emit('update-query', localQuery.value)
 }
 
-function selectPreview(item) {
-    previewKey.value = item.key
-}
-
-function openPreview() {
-    if (!previewItem.value) {
-        return
-    }
-
-    emit('open-result', previewItem.value)
+function selectResult(item) {
+    emit('open-result', item)
 }
 
 function quoteVerse(text) {
@@ -70,16 +48,21 @@ function formatDatePeriod(date, time) {
     const period = String(time).toLowerCase() === 'pm' ? 'Evening' : 'Morning'
     return `${monthLabel} ${day} — ${period}`
 }
+
+const {panelDragStyle, onHandleTouchStart, onHandleTouchMove, onHandleTouchEnd} = useSwipeToClose(() => emit('close'))
 </script>
 
 <template>
     <section class="search-shell" :class="show ? 'is-open' : 'is-closed'">
         <button class="sheet-backdrop" aria-label="Close search" @click="emit('close')"></button>
-        <div class="search-panel" :class="show ? 'panel-visible' : 'panel-hidden'">
-            <div class="sheet-handle"></div>
+        <div class="search-panel" :class="show ? 'panel-visible' : 'panel-hidden'" :style="panelDragStyle">
+            <button class="sheet-handle" aria-label="Close search"
+                    @click="emit('close')"
+                    @touchstart="onHandleTouchStart"
+                    @touchmove="onHandleTouchMove"
+                    @touchend="onHandleTouchEnd"></button>
             <div class="panel-head">
                 <h2>Search Devotionals</h2>
-                <button class="close-btn" @click="emit('close')" aria-label="Close search">×</button>
             </div>
             <input
                 v-model="localQuery"
@@ -95,8 +78,7 @@ function formatDatePeriod(date, time) {
                     v-for="item in results"
                     :key="item.key"
                     class="result-item"
-                    :class="item.key === previewKey ? 'selected' : ''"
-                    @click="selectPreview(item)"
+                    @click="selectResult(item)"
                 >
                     <span class="result-date">{{ formatDatePeriod(item.date, item.time) }}</span>
                     <span class="result-verse">{{ quoteVerse(item.keyverse) }}</span>
@@ -106,14 +88,6 @@ function formatDatePeriod(date, time) {
                     </div>
                 </button>
             </div>
-
-            <div v-if="previewItem" class="preview-box">
-                <h3>Preview</h3>
-                <p class="preview-verse">{{ quoteVerse(previewItem.keyverse) }}</p>
-                <p class="preview-ref" v-if="previewItem.verseRef">{{ previewItem.verseRef }}</p>
-                <p class="preview-text">{{ previewItem.preview }}</p>
-                <button class="open-btn" @click="openPreview">Open Devotional</button>
-            </div>
         </div>
     </section>
 </template>
@@ -121,8 +95,11 @@ function formatDatePeriod(date, time) {
 <style scoped>
 .search-shell {
     position: absolute;
-    inset: 0;
-    z-index: 26;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: var(--footer-height, 0px);
+    z-index: 15;
     pointer-events: none;
     display: flex;
     align-items: flex-end;
@@ -162,16 +139,32 @@ function formatDatePeriod(date, time) {
 }
 
 .sheet-handle {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 1.6rem;
+    border: 0;
+    background: transparent;
+    margin: 0 auto 0.2rem;
+    padding: 0;
+    cursor: pointer;
+    touch-action: none;
+}
+
+.sheet-handle::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 3rem;
     height: 0.34rem;
     border-radius: 999px;
-    margin: 0.15rem auto 0.75rem;
     background: color-mix(in srgb, var(--text-secondary) 40%, transparent);
 }
 
 .panel-head {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     margin-bottom: 0.5rem;
 }
@@ -180,17 +173,6 @@ function formatDatePeriod(date, time) {
     margin: 0;
     color: var(--text-primary);
     font-size: 1rem;
-}
-
-.close-btn {
-    border: 0;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 999px;
-    background: var(--support-row-background);
-    color: var(--support-row-text);
-    font-size: 1.25rem;
-    box-shadow: inset 0 0 0 1px var(--support-row-border);
 }
 
 .search-input {
@@ -226,11 +208,6 @@ function formatDatePeriod(date, time) {
     gap: 0.2rem;
 }
 
-.result-item.selected {
-    background: var(--highlight);
-    border-color: var(--accent-secondary);
-}
-
 .result-date {
     font-size: 0.72rem;
     color: var(--text-secondary);
@@ -264,49 +241,4 @@ function formatDatePeriod(date, time) {
     text-transform: capitalize;
 }
 
-.preview-box {
-    margin-top: 0.65rem;
-    border-radius: 0.9rem;
-    background: var(--surface);
-    padding: 0.7rem;
-    border: 1px solid var(--border);
-}
-
-.preview-box h3 {
-    margin: 0 0 0.35rem;
-    color: var(--text-secondary);
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
-
-.preview-verse {
-    margin: 0;
-    font-size: 0.84rem;
-    color: var(--text-primary);
-    font-weight: 600;
-}
-
-.preview-ref {
-    margin: 0.2rem 0 0;
-    font-size: 0.76rem;
-    color: var(--text-muted, var(--text-secondary));
-}
-
-.preview-text {
-    margin: 0.45rem 0 0;
-    font-size: 0.82rem;
-    color: var(--text-secondary);
-}
-
-.open-btn {
-    margin-top: 0.65rem;
-    border: 0;
-    width: 100%;
-    min-height: 2.4rem;
-    border-radius: 0.75rem;
-    background: var(--button-primary);
-    color: var(--button-primary-text);
-    font-weight: 600;
-}
 </style>

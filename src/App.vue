@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue'
 import Header from './components/Header.vue'
 import Body from './components/Body.vue'
 import MobileMenu from './components/MobileMenu.vue'
@@ -12,6 +12,9 @@ import { useAppStore } from './store'
 import { eveningTheme, morningTheme, themeToCssVariables } from './theme'
 
 const isLoading = ref(true)
+const footerBar = ref(null)
+const footerHeight = ref(0)
+let footerResizeObserver = null
 const showMenu = ref(false)
 const showAbout = ref(false)
 const showSearch = ref(false)
@@ -38,6 +41,22 @@ const isCurrentBookmarked = computed(() => {
     return store.isBookmarked(effectiveDate.value, effectiveTime.value)
 })
 
+const activePanel = computed(() => {
+    if (showSearch.value) {
+        return 'search'
+    }
+    if (showDatePicker.value) {
+        return 'date'
+    }
+    if (showMenu.value) {
+        return 'settings'
+    }
+    if (showBookmarks.value) {
+        return 'bookmarks'
+    }
+    return null
+})
+
 const theme = computed(() => {
     if (store.theme === 'auto') {
         return effectiveTime.value === 'am' ? 'morning' : 'evening'
@@ -48,6 +67,17 @@ const theme = computed(() => {
 
 const activeTheme = computed(() => (theme.value === 'morning' ? morningTheme : eveningTheme))
 const themeCssVariables = computed(() => themeToCssVariables(activeTheme.value))
+
+watch(activePanel, (nextPanel, previousPanel) => {
+    if (nextPanel || !previousPanel) {
+        return
+    }
+
+    // iOS Safari can leave the page scrolled/blank after the keyboard (from the
+    // search input) dismisses, so force focus away and reset scroll on close.
+    document.activeElement?.blur?.()
+    window.scrollTo(0, 0)
+})
 
 onBeforeMount(() => {
     store.initializeDateContext()
@@ -65,6 +95,21 @@ onMounted(() => {
     }, 60000)
 })
 
+watch(isLoading, async (loading) => {
+    if (loading) {
+        return
+    }
+
+    await nextTick()
+
+    if (footerBar.value?.$el) {
+        footerResizeObserver = new ResizeObserver((entries) => {
+            footerHeight.value = entries[0].contentRect.height
+        })
+        footerResizeObserver.observe(footerBar.value.$el)
+    }
+})
+
 onUnmounted(() => {
     if (dateTimer) {
         clearInterval(dateTimer)
@@ -72,6 +117,10 @@ onUnmounted(() => {
 
     if (bookmarkToastTimer) {
         clearTimeout(bookmarkToastTimer)
+    }
+
+    if (footerResizeObserver) {
+        footerResizeObserver.disconnect()
     }
 })
 
@@ -99,6 +148,11 @@ function toggleAbout() {
 }
 
 function openSearchPanel() {
+    if (showSearch.value) {
+        showSearch.value = false
+        return
+    }
+
     showMenu.value = false
     showDatePicker.value = false
     showBookmarks.value = false
@@ -106,6 +160,11 @@ function openSearchPanel() {
 }
 
 function openDatePanel() {
+    if (showDatePicker.value) {
+        showDatePicker.value = false
+        return
+    }
+
     showMenu.value = false
     showSearch.value = false
     showBookmarks.value = false
@@ -113,6 +172,11 @@ function openDatePanel() {
 }
 
 function openBookmarksPanel() {
+    if (showBookmarks.value) {
+        showBookmarks.value = false
+        return
+    }
+
     showMenu.value = false
     showSearch.value = false
     showDatePicker.value = false
@@ -120,6 +184,11 @@ function openBookmarksPanel() {
 }
 
 function openSettingsPanel() {
+    if (showMenu.value) {
+        showMenu.value = false
+        return
+    }
+
     closeNavigationPanels()
     showAbout.value = false
     showMenu.value = true
@@ -132,7 +201,10 @@ function openSearchResult(item) {
 
 function applyDateSelection(payload) {
     store.openDevotional(payload.date, payload.period)
-    showDatePicker.value = false
+
+    if (!payload.keepOpen) {
+        showDatePicker.value = false
+    }
 }
 
 function goToToday() {
@@ -225,7 +297,7 @@ function setStatusBarTheme() {
         <div class="scene-shape shape-a"></div>
         <div class="scene-shape shape-b"></div>
         <div class="scene-shape shape-c"></div>
-        <div class="reader-shell">
+        <div class="reader-shell" :style="{'--footer-height': footerHeight + 'px'}">
             <Header
                 id="header"
                 v-if="effectiveDate"
@@ -240,7 +312,9 @@ function setStatusBarTheme() {
                 :content="selectedContent"
             />
             <FooterControlBar
+                ref="footerBar"
                 :current-period="effectiveTime"
+                :active-panel="activePanel"
                 @open-search="openSearchPanel"
                 @open-date="openDatePanel"
                 @toggle-period="togglePeriodQuick"
@@ -312,7 +386,11 @@ function setStatusBarTheme() {
 </template>
 
 <style lang="scss">
-html,
+html {
+    height: 100%;
+    overflow: hidden;
+}
+
 body,
 #app {
     height: 100%;
@@ -321,12 +399,17 @@ body,
 
 body {
     margin: 0;
+    overflow: hidden;
+    position: fixed;
+    inset: 0;
+    width: 100%;
     touch-action: manipulation;
     font-family: "Avenir Next", "Segoe UI", sans-serif;
 }
 
 #app {
     display: flex;
+    overflow: hidden;
 }
 
 .app-scene {

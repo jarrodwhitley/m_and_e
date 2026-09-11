@@ -1,4 +1,6 @@
 <script setup>
+import { useSwipeToClose } from '../composables/useSwipeToClose'
+
 defineProps({
     show: Boolean,
     bookmarks: {
@@ -34,16 +36,21 @@ function quoteVerse(text) {
     const normalized = String(text || '').trim().replace(/^"+|"+$/g, '')
     return normalized ? `"${normalized}"` : ''
 }
+
+const {panelDragStyle, onHandleTouchStart, onHandleTouchMove, onHandleTouchEnd} = useSwipeToClose(() => emit('close'))
 </script>
 
 <template>
     <section class="bookmarks-shell" :class="show ? 'is-open' : 'is-closed'">
         <button class="sheet-backdrop" aria-label="Close bookmarks" @click="emit('close')"></button>
-        <div class="bookmarks-panel" :class="show ? 'panel-visible' : ''">
-            <div class="sheet-handle"></div>
+        <div class="bookmarks-panel" :class="show ? 'panel-visible' : ''" :style="panelDragStyle">
+            <button class="sheet-handle" aria-label="Close bookmarks"
+                    @click="emit('close')"
+                    @touchstart="onHandleTouchStart"
+                    @touchmove="onHandleTouchMove"
+                    @touchend="onHandleTouchEnd"></button>
             <div class="panel-head">
                 <h2>Saved Devotionals</h2>
-                <button class="close-btn" @click="emit('close')" aria-label="Close bookmarks">×</button>
             </div>
 
             <p v-if="!bookmarks.length" class="hint">No bookmarks yet. Tap the bookmark icon in the top right in any devotional to save it.</p>
@@ -69,8 +76,11 @@ function quoteVerse(text) {
 <style scoped>
 .bookmarks-shell {
     position: absolute;
-    inset: 0;
-    z-index: 26;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: var(--footer-height, 0px);
+    z-index: 15;
     pointer-events: none;
     display: flex;
     align-items: flex-end;
@@ -94,7 +104,7 @@ function quoteVerse(text) {
 
 .bookmarks-panel {
     width: 100%;
-    max-height: 75vh;
+    max-height: min(75vh, calc(100dvh - var(--footer-height, 0px) - 3rem));
     border-radius: 1.6rem 1.6rem 0 0;
     background: linear-gradient(to bottom, color-mix(in srgb, var(--surface) 85%, var(--surface-secondary)), var(--surface-secondary));
     box-shadow: 0 -14px 36px rgba(23, 33, 48, 0.25);
@@ -105,20 +115,37 @@ function quoteVerse(text) {
 }
 
 .panel-visible {
-    transform: translateY(0);
+    /* translateY (not margin-top) reliably leaves a header gap on iOS Safari */
+    transform: translateY(1em);
 }
 
 .sheet-handle {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 1.6rem;
+    border: 0;
+    background: transparent;
+    margin: 0 auto 0.2rem;
+    padding: 0;
+    cursor: pointer;
+    touch-action: none;
+}
+
+.sheet-handle::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 3rem;
     height: 0.34rem;
     border-radius: 999px;
-    margin: 0.15rem auto 0.75rem;
     background: color-mix(in srgb, var(--text-secondary) 40%, transparent);
 }
 
 .panel-head {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     margin-bottom: 0.55rem;
 }
@@ -127,17 +154,6 @@ function quoteVerse(text) {
     margin: 0;
     color: var(--text-primary);
     font-size: 1rem;
-}
-
-.close-btn {
-    border: 0;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 999px;
-    background: var(--support-row-background);
-    color: var(--support-row-text);
-    font-size: 1.25rem;
-    box-shadow: inset 0 0 0 1px var(--support-row-border);
 }
 
 .hint {

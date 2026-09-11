@@ -3,6 +3,10 @@ defineProps({
     currentPeriod: {
         type: String,
         default: 'am'
+    },
+    activePanel: {
+        type: String,
+        default: null
     }
 })
 
@@ -11,24 +15,24 @@ defineEmits(['open-search', 'open-date', 'toggle-period', 'open-bookmarks', 'ope
 
 <template>
     <nav class="control-bar" aria-label="Devotional controls">
-        <button class="control-btn" @click="$emit('open-search')" aria-label="Search devotionals">
+        <button class="control-btn" :class="{'is-selected': activePanel === 'search'}" @click="$emit('open-search')" aria-label="Search devotionals">
             <span class="material-symbols-rounded icon" aria-hidden="true">search</span>
             <span class="label">Search</span>
         </button>
-        <button class="control-btn" @click="$emit('open-date')" aria-label="Select date">
+        <button class="control-btn" :class="{'is-selected': activePanel === 'date'}" @click="$emit('open-date')" aria-label="Select date">
             <span class="material-symbols-rounded icon" aria-hidden="true">calendar_month</span>
             <span class="label">Date</span>
         </button>
-        <button class="control-btn" :class="currentPeriod === 'pm' ? 'is-evening' : 'is-morning'" @click="$emit('toggle-period')" aria-label="Toggle morning evening">
+        <button class="control-btn" @click="$emit('toggle-period')" aria-label="Toggle morning evening">
             <span class="material-symbols-rounded icon" aria-hidden="true">{{ currentPeriod === 'am' ? 'light_mode' : 'dark_mode' }}</span>
             <span class="label">{{ currentPeriod === 'am' ? 'Morning' : 'Evening' }}</span>
         </button>
-        <button class="control-btn" @click="$emit('open-settings')" aria-label="Open settings">
+        <button class="control-btn" :class="{'is-selected': activePanel === 'settings'}" @click="$emit('open-settings')" aria-label="Open settings">
             <span class="material-symbols-rounded icon" aria-hidden="true">settings</span>
             <span class="label">Settings</span>
         </button>
 
-        <button class="control-btn" @click="$emit('open-bookmarks')" aria-label="Open saved devotionals">
+        <button class="control-btn" :class="{'is-selected': activePanel === 'bookmarks'}" @click="$emit('open-bookmarks')" aria-label="Open saved devotionals">
             <span class="material-symbols-rounded icon icon-filled" aria-hidden="true">bookmark</span>
             <span class="label">Saved</span>
         </button>
@@ -78,16 +82,19 @@ defineEmits(['open-search', 'open-date', 'toggle-period', 'open-bookmarks', 'ope
     line-height: 1;
 }
 
-.control-btn.is-morning,
-.control-btn.is-evening {
+.control-btn.is-selected {
     color: var(--selected-text);
     background: color-mix(in srgb, var(--selected-background) 64%, transparent);
 }
 
-.control-btn:hover,
 .control-btn:focus-visible {
     color: var(--text-primary);
     background: color-mix(in srgb, var(--surface) 72%, transparent);
+}
+
+.control-btn.is-selected:focus-visible {
+    color: var(--selected-text);
+    background: color-mix(in srgb, var(--selected-background) 64%, transparent);
 }
 
 .control-btn:active {

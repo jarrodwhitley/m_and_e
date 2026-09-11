@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { useSwipeToClose } from '../composables/useSwipeToClose'
 
 const props = defineProps({
     show: Boolean,
@@ -82,14 +83,15 @@ function initializeSelectedDate() {
     selectedDay.value = firstDay ? String(firstDay) : ''
 }
 
-function emitSelectedDevotional() {
+function emitSelectedDevotional(keepOpen = false) {
     if (!selectedMonth.value || !selectedDay.value) {
         return
     }
 
     emit('select-date', {
         date: `${Number(selectedMonth.value)}-${Number(selectedDay.value)}`,
-        period: selectedPeriod.value
+        period: selectedPeriod.value,
+        keepOpen
     })
 }
 
@@ -114,38 +116,30 @@ watch(selectedMonth, () => {
     }
 })
 
-const prettyDate = computed(() => {
-    if (!selectedMonth.value || !selectedDay.value) {
-        return ''
-    }
-
-    const monthName = monthNames[Number(selectedMonth.value) - 1] || ''
-    return `${monthName} ${Number(selectedDay.value)}`
-})
-
 function chooseToday() {
     emit('go-today')
 }
 
-function onDayChange() {
-    emitSelectedDevotional()
-}
-
 function onPeriodChange(period) {
     selectedPeriod.value = period
-    emitSelectedDevotional()
 }
+
+function confirmJumpToDate() {
+    emitSelectedDevotional(false)
+}
+
+const {panelDragStyle, onHandleTouchStart, onHandleTouchMove, onHandleTouchEnd} = useSwipeToClose(() => emit('close'))
 </script>
 
 <template>
     <section class="date-shell" :class="show ? 'is-open' : 'is-closed'">
         <button class="sheet-backdrop" aria-label="Close date picker" @click="emit('close')"></button>
-        <div class="date-panel" :class="show ? 'panel-visible' : ''">
-            <div class="sheet-handle"></div>
-            <div class="panel-head">
-                <h2>Jump To Date</h2>
-                <button class="close-btn" @click="emit('close')" aria-label="Close date picker">×</button>
-            </div>
+        <div class="date-panel" :class="show ? 'panel-visible' : ''" :style="panelDragStyle">
+            <button class="sheet-handle" aria-label="Close date picker"
+                    @click="emit('close')"
+                    @touchstart="onHandleTouchStart"
+                    @touchmove="onHandleTouchMove"
+                    @touchend="onHandleTouchEnd"></button>
 
             <label class="field-label" for="devotional-month">Date</label>
             <div class="date-fields">
@@ -154,7 +148,7 @@ function onPeriodChange(period) {
                         {{ monthNames[month - 1] }}
                     </option>
                 </select>
-                <select id="devotional-day" v-model="selectedDay" class="date-select" @change="onDayChange">
+                <select id="devotional-day" v-model="selectedDay" class="date-select">
                     <option v-for="day in dayOptions" :key="day" :value="String(day)">
                         {{ day }}
                     </option>
@@ -166,9 +160,8 @@ function onPeriodChange(period) {
                 <button class="period-btn" :class="selectedPeriod === 'pm' ? 'selected' : ''" @click="onPeriodChange('pm')">Evening</button>
             </div>
 
-            <p class="preview">{{ prettyDate }} • {{ selectedPeriod === 'am' ? 'Morning' : 'Evening' }}</p>
-
             <div class="action-row">
+                <button class="primary-btn" @click="confirmJumpToDate">Jump To Date</button>
                 <button class="secondary-btn" @click="chooseToday">Go To Today</button>
             </div>
         </div>
@@ -178,8 +171,11 @@ function onPeriodChange(period) {
 <style scoped>
 .date-shell {
     position: absolute;
-    inset: 0;
-    z-index: 26;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: var(--footer-height, 0px);
+    z-index: 15;
     pointer-events: none;
     display: flex;
     align-items: flex-end;
@@ -216,35 +212,28 @@ function onPeriodChange(period) {
 }
 
 .sheet-handle {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 1.6rem;
+    border: 0;
+    background: transparent;
+    margin: 0 auto 0.2rem;
+    padding: 0;
+    cursor: pointer;
+    touch-action: none;
+}
+
+.sheet-handle::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 3rem;
     height: 0.34rem;
     border-radius: 999px;
-    margin: 0.15rem auto 0.75rem;
     background: color-mix(in srgb, var(--text-secondary) 40%, transparent);
-}
-
-.panel-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.55rem;
-}
-
-.panel-head h2 {
-    margin: 0;
-    color: var(--text-primary);
-    font-size: 1rem;
-}
-
-.close-btn {
-    border: 0;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 999px;
-    background: var(--support-row-background);
-    color: var(--support-row-text);
-    font-size: 1.25rem;
-    box-shadow: inset 0 0 0 1px var(--support-row-border);
 }
 
 .field-label {
@@ -270,6 +259,16 @@ function onPeriodChange(period) {
     background: var(--surface);
 }
 
+/* iOS Safari renders the native select caret/text using the light color
+   scheme by default, making it black on the dark evening theme. */
+:global(.evening) .date-select {
+    color-scheme: dark;
+}
+
+:global(.morning) .date-select {
+    color-scheme: light;
+}
+
 .period-row {
     margin-top: 0.6rem;
     display: grid;
@@ -291,14 +290,8 @@ function onPeriodChange(period) {
     color: var(--button-primary-text);
 }
 
-.preview {
-    margin: 0.7rem 0 0;
-    color: var(--text-secondary);
-    font-size: 0.85rem;
-}
-
 .action-row {
-    margin-top: 0.75rem;
+    margin-top: 2rem;
     display: grid;
     grid-template-columns: 1fr;
     gap: 0.5rem;
@@ -315,5 +308,14 @@ function onPeriodChange(period) {
     background: var(--support-row-background);
     color: var(--support-row-text);
     box-shadow: inset 0 0 0 1px var(--support-row-border);
+}
+
+.primary-btn {
+    border: 0;
+    border-radius: 0.75rem;
+    min-height: 2.45rem;
+    font-weight: 600;
+    background: var(--button-primary);
+    color: var(--button-primary-text);
 }
 </style>

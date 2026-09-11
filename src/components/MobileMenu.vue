@@ -1,7 +1,8 @@
 <script setup>
 import {useAppStore} from '../store'
+import {useSwipeToClose} from '../composables/useSwipeToClose'
 
-defineEmits(['increaseFontSize', 'decreaseFontSize', 'resetSettings', 'theme-auto', 'theme-light', 'theme-dark', 'close-menu'])
+const emit = defineEmits(['increaseFontSize', 'decreaseFontSize', 'resetSettings', 'theme-auto', 'theme-light', 'theme-dark', 'close-menu'])
 
 const props = defineProps({
     showMenu: Boolean,
@@ -38,6 +39,8 @@ function shareDevotion() {
 function setTextSize(size) {
     store.setFontSize(size)
 }
+
+const {panelDragStyle, onHandleTouchStart, onHandleTouchMove, onHandleTouchEnd} = useSwipeToClose(() => emit('close-menu'))
 </script>
 
 <template>
@@ -45,8 +48,12 @@ function setTextSize(size) {
            :class="props.showMenu ? 'is-open' : 'is-closed'"
            :style="'font-size:' + store.fontSize.toString() +'px;'">
         <button class="sheet-backdrop" aria-label="Close settings" @click="$emit('close-menu')"></button>
-        <div class="settings-panel" :class="props.showMenu ? 'panel-visible' : 'panel-hidden'">
-            <div class="sheet-handle"></div>
+        <div class="settings-panel" :class="props.showMenu ? 'panel-visible' : 'panel-hidden'" :style="panelDragStyle">
+            <button class="sheet-handle" aria-label="Close settings"
+                    @click="$emit('close-menu')"
+                    @touchstart="onHandleTouchStart"
+                    @touchmove="onHandleTouchMove"
+                    @touchend="onHandleTouchEnd"></button>
             <h2 class="settings-heading">Appearance</h2>
             <div class="settings-card">
                 <label class="section-label">Theme</label>
@@ -96,8 +103,11 @@ function setTextSize(size) {
 <style lang="scss" scoped>
 .settings-shell {
     position: absolute;
-    inset: 0;
-    z-index: 25;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: var(--footer-height, 0px);
+    z-index: 15;
     pointer-events: none;
     display: flex;
     align-items: flex-end;
@@ -144,10 +154,27 @@ function setTextSize(size) {
 }
 
 .sheet-handle {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 1.6rem;
+    border: 0;
+    background: transparent;
+    margin: 0 auto 0.2rem;
+    padding: 0;
+    cursor: pointer;
+    touch-action: none;
+}
+
+.sheet-handle::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 3rem;
     height: 0.34rem;
     border-radius: 999px;
-    margin: 0.15rem auto 0.8rem;
     background: color-mix(in srgb, var(--text-secondary) 40%, transparent);
 }
 
