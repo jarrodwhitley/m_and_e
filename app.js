@@ -2,7 +2,6 @@ import { createApp } from 'vue'
 import { createPinia} from "pinia";
 import './style.css'
 import App from './src/App.vue'
-import './spurgeon_icon_color.png'
 import { useAppStore } from './src/store'
 
 const pinia = createPinia()
@@ -14,3 +13,11 @@ store.initializeDateContext()
 store.loadBookmarksFromStorage()
 
 app.mount('#app')
+
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register(`${import.meta.env.BASE_URL}service-worker.js`)
+            .catch((err) => console.error('Service Worker registration failed:', err))
+    })
+}
+
