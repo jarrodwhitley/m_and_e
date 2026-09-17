@@ -92,14 +92,9 @@ function getMonthName(date) {
     border-radius: 0;
 }
 
-.logo-button {
-    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--accent-secondary) 60%, transparent);
-}
-
 .logo-mark {
-    width: 1.7rem;
-    height: 1.7rem;
-    opacity: 0.9;
+    width: auto;
+    height: 2.5rem;
 }
 
 .save-icon {
