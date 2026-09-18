@@ -104,7 +104,9 @@ watch(isLoading, async (loading) => {
 
     if (footerBar.value?.$el) {
         footerResizeObserver = new ResizeObserver((entries) => {
-            footerHeight.value = entries[0].contentRect.height
+            // contentRect excludes padding, so it misses the safe-area-inset-bottom
+            // padding on the control bar; use the element's full border-box height instead.
+            footerHeight.value = entries[0].target.offsetHeight
         })
         footerResizeObserver.observe(footerBar.value.$el)
     }
