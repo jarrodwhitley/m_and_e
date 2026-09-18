@@ -10,6 +10,7 @@ import DatePickerPanel from './components/DatePickerPanel.vue'
 import BookmarksPanel from './components/BookmarksPanel.vue'
 import { useAppStore } from './store'
 import { eveningTheme, morningTheme, themeToCssVariables } from './theme'
+import spurgeonIcon from './assets/spurgeon_icon.png'
 
 const isLoading = ref(true)
 const footerBar = ref(null)
@@ -374,7 +375,7 @@ function setStatusBarTheme() {
         </div>
         <div class="modal transition-all" :class="showAbout ? '-translate-x-0' : '-translate-x-full'">
             <button class="modal-close" @click="toggleAbout" aria-label="Close about dialog">×</button>
-            <img class="w-20 mx-auto" src="/assets/spurgeon_icon.png" alt="spurgeon icon black"/>
+            <img class="w-20 mx-auto" :src="spurgeonIcon" alt="spurgeon icon black"/>
             <h1 class="text-3xl text-center">Morning & Evening</h1>
             <h3 class="text-center">By Charles Haddon Spurgeon</h3>
             <p class="mt-8">Charles Haddon Spurgeon (1834-1892) was a British Baptist minister and renowned author who is considered one of the most influential figures in Christian history. Known as the "Prince of Preachers," Spurgeon delivered powerful sermons that attracted thousands of people every week, filling London's Metropolitan Tabernacle to capacity. He was also a prolific writer, penning countless devotionals, commentaries, and sermons that continue to inspire and encourage readers today.</p>

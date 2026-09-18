@@ -13,6 +13,13 @@ export default defineConfig({
         outDir: './dist',
         emptyOutDir: true, // also necessary
         manifest: true,
+        rollupOptions: {
+            output: {
+                entryFileNames: 'assets/[name]-[hash].js',
+                chunkFileNames: 'assets/[name]-[hash].js',
+                assetFileNames: 'assets/[name]-[hash][extname]',
+            },
+        },
     },
     plugins: [vue()],
 })

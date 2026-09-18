@@ -8,6 +8,7 @@
         "free:5173": "sh -c 'pids=$(lsof -ti tcp:5173); if [ -n \"$pids\" ]; then kill -9 $pids; fi'",
         "dev": "npm run free:5173 && vite --host --port 5173 --strictPort",
         "build": "vite build",
+        "postbuild": "node scripts/hash-public-assets.mjs",
         "pwa": "vite build --mode pwa",
         "preview": "vite preview",
         "tailwind": "npx tailwindcss -i ./src/css/input.css -o ./style.css",

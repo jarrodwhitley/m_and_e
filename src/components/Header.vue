@@ -1,5 +1,6 @@
 <script setup>
 import {computed} from "vue";
+import spurgeonIcon from '../assets/spurgeon_icon.png'
 
 defineEmits(['toggleBookmark', 'toggleAbout'])
 const props = defineProps({
@@ -30,7 +31,7 @@ function getMonthName(date) {
 <template>
     <header class="reader-header">
         <button class="logo-button" @click="$emit('toggleAbout')" aria-label="About this app">
-            <img class="logo-mark" src="/assets/spurgeon_icon.png" alt="Spurgeon logo"/>
+            <img class="logo-mark" :src="spurgeonIcon" alt="Spurgeon logo"/>
         </button>
         <div class="date" v-text="headerTitle"></div>
         <button class="icon-button" :class="props.isBookmarked ? 'icon-button-active' : ''" @click="$emit('toggleBookmark')"
