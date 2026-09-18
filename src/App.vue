@@ -389,7 +389,7 @@ function setStatusBarTheme() {
 
 <style lang="scss">
 html {
-    height: 100%;
+    height: 100vh;
     overflow: hidden;
 }
 
