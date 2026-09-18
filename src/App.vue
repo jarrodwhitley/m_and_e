@@ -416,8 +416,9 @@ body {
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --control-bar-height: 64px;
-    min-height: 100vh;
-    min-height: 100dvh;
+    height: 100vh;
+    height: 100dvh;
+    height: -webkit-fill-available;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -462,8 +463,9 @@ body {
 .reader-shell {
     width: 100%;
     max-width: 28rem;
-    min-height: 100vh;
-    min-height: 100dvh;
+    height: 100vh;
+    height: 100dvh;
+    height: -webkit-fill-available;
     position: relative;
     z-index: 2;
     border-radius: 0;
@@ -592,7 +594,7 @@ body {
 
 @media (min-width: 960px) {
     .reader-shell {
-        min-height: calc(100dvh - 2rem);
+        height: calc(100dvh - 2rem);
         max-height: calc(100dvh - 2rem);
     }
 }
