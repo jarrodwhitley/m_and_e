@@ -9,7 +9,7 @@
         "dev": "npm run free:5173 && vite --host --port 5173 --strictPort",
         "build": "vite build",
         "postbuild": "node scripts/hash-public-assets.mjs",
-        "pwa": "vite build --mode pwa",
+        "pwa": "vite build --mode pwa && npm run postbuild",
         "preview": "vite preview",
         "tailwind": "npx tailwindcss -i ./src/css/input.css -o ./style.css",
         "watch:css": "npx tailwindcss -i ./src/css/input.css -o ./style.css --watch",
