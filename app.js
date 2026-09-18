@@ -4,6 +4,17 @@ import './style.css'
 import App from './src/App.vue'
 import { useAppStore } from './src/store'
 
+// iOS standalone (Add to Home Screen) WKWebView can misreport 100vh/100dvh,
+// leaving a gap at the bottom, so mirror the real visible height in a CSS var.
+function updateAppHeight() {
+    const height = window.visualViewport?.height || window.innerHeight
+    document.documentElement.style.setProperty('--app-height', `${height}px`)
+}
+updateAppHeight()
+window.visualViewport?.addEventListener('resize', updateAppHeight)
+window.addEventListener('resize', updateAppHeight)
+window.addEventListener('orientationchange', updateAppHeight)
+
 const pinia = createPinia()
 const app = createApp(App)
 app.use(pinia)

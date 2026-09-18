@@ -421,6 +421,7 @@ body {
     height: 100vh;
     height: 100dvh;
     height: -webkit-fill-available;
+    height: var(--app-height, 100dvh);
     width: 100%;
     display: flex;
     justify-content: center;
@@ -468,6 +469,7 @@ body {
     height: 100vh;
     height: 100dvh;
     height: -webkit-fill-available;
+    height: var(--app-height, 100dvh);
     position: relative;
     z-index: 2;
     border-radius: 0;
@@ -596,8 +598,8 @@ body {
 
 @media (min-width: 960px) {
     .reader-shell {
-        height: calc(100dvh - 2rem);
-        max-height: calc(100dvh - 2rem);
+        height: calc(var(--app-height, 100dvh) - 2rem);
+        max-height: calc(var(--app-height, 100dvh) - 2rem);
     }
 }
 </style>
